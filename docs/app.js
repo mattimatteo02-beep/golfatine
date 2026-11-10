@@ -210,7 +210,7 @@
       const b = e.target.closest(".player"); if (!b) return;
       $("m-player").value = b.dataset.p; $("m-game").value = "all"; $("m-season").value = "all";
       shown = PAGE; renderMatches();
-      $("partite").scrollIntoView();
+      location.hash = "partite";
     });
   }
 
@@ -336,6 +336,24 @@
     $("unreadable").innerHTML = D.unreadable.map((m) => `<li><a href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.title)}</a> (${dateIt(m.date)}): ${esc(m.note.replace(/^.*risultato non leggibile:\s*/i, ""))}</li>`).join("");
     $("footer").innerHTML = `Dati aggiornati al ${dateIt(D.updated)} · ultima partita del ${dateIt(D.lastMatch)} · risultati letti dai tabelloni finali dei video.`;
   }
+
+  // ---------- pagine ----------
+  const VIEW_OF = { albo: "home", ultima: "home", sfide: "giocatori", regole: "record" };
+  function route() {
+    const h = location.hash.slice(1);
+    const sections = [...document.querySelectorAll("[data-view]")];
+    const views = new Set(sections.map((s) => s.dataset.view));
+    const view = views.has(h) ? h : VIEW_OF[h] || "home";
+    sections.forEach((s) => (s.hidden = s.dataset.view !== view));
+    document.querySelectorAll(".nav a").forEach((a) => {
+      if (a.getAttribute("href") === "#" + view) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
+    });
+    const target = h && h !== view ? document.getElementById(h) : null;
+    if (target) target.scrollIntoView(); else window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", route);
+  route();
 
   renderHero(); renderLast(); initTable(); renderAlbo(); renderPlayers(); initMatches(); initH2H(); renderRecords(); renderRules();
 })();

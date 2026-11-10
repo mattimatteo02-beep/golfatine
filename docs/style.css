@@ -59,6 +59,7 @@ a { color: inherit; }
 .nav::-webkit-scrollbar { display: none; }
 .nav a { text-decoration: none; white-space: nowrap; padding: 6px 10px; border-radius: 6px; font: 600 .95rem/1 var(--font-display); letter-spacing: .06em; text-transform: uppercase; opacity: .85; }
 .nav a:hover { opacity: 1; background: rgba(255,255,255,.1); }
+.nav a[aria-current="page"] { opacity: 1; background: rgba(255,255,255,.16); box-shadow: inset 0 -2px 0 var(--flag); }
 
 /* Hero */
 .hero { background: var(--fairway); color: var(--fairway-ink); padding-block: 40px 48px; }
@@ -270,10 +271,7 @@ textarea { width: 100%; min-height: 80px; resize: vertical; }
   .acct-in { grid-template-columns: minmax(0, 1fr); }
   .acct-actions { justify-content: flex-start; }
 }
-@media (max-width: 560px) {
-  .opt { grid-template-columns: minmax(0, 1fr) 4ch 6ch; }
-  .opt .btn { grid-column: 1 / -1; }
-}
+
 
 /* ---------- Admin ---------- */
 .admin-form { gap: 14px; }
@@ -282,3 +280,27 @@ textarea { width: 100%; min-height: 80px; resize: vertical; }
 .field-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
 .check { display: flex; gap: 8px; align-items: center; font-size: .95rem; }
 .market-edit { border: 1px dashed var(--line); border-radius: 8px; padding: 14px; margin: 0 0 10px; display: grid; gap: 10px; min-width: 0; }
+
+/* ---------- Pagine semplificate ---------- */
+.hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+.btn.cta { background: var(--flag); border-color: var(--flag); color: #1b1a10; text-decoration: none; padding: 13px 20px; font-size: 1.05rem; }
+.btn.ghost-light { background: transparent; border-color: rgba(255,255,255,.4); color: var(--fairway-ink); text-decoration: none; padding: 13px 20px; font-size: 1.05rem; }
+.club-chip { font-size: 1rem; padding: 8px 14px; }
+.steps { list-style: none; counter-reset: s; margin: 12px 0 20px; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: start; color: var(--muted); }
+.steps li::before { content: counter(s); width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--fairway); color: var(--fairway-ink); font: 700 1.1rem/1 var(--font-display); }
+.steps strong { color: var(--ink); }
+.earn-box { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+.earn-box summary { cursor: pointer; font: 700 1.05rem/1.2 var(--font-display); text-transform: uppercase; letter-spacing: .03em; }
+.earn-box .earn { margin-top: 10px; }
+.bal-label { margin: 0; font: 600 .78rem/1.2 var(--font-display); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.acct-in .bal .num { font-size: 3rem; }
+.opt.pick { width: 100%; font: inherit; color: inherit; background: var(--surface); text-align: left; cursor: pointer; grid-template-columns: minmax(0, 1fr) auto; }
+.opt.pick:hover { border-color: var(--focus); }
+.opt.pick.chosen { border-color: var(--fairway); box-shadow: 0 0 0 2px var(--fairway); }
+.opt { grid-template-columns: minmax(0, 1fr) auto; }
+.bet-box { display: grid; gap: 8px; background: var(--chip); border-radius: 8px; padding: 12px; }
+.bet-box .amt { flex: 0 0 100px; }
+.btn.wide { width: 100%; }
+a.btn { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.opt.admin-opt { grid-template-columns: minmax(0, 1fr) auto auto; }
