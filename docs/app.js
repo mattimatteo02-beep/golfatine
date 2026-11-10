@@ -199,7 +199,7 @@
     $("players").innerHTML = list.map((x) => {
       const pl = D.players[x.p];
       const alias = pl.alias.replace(/\s*\(da confermare\)/g, "");
-      return `<button class="player" type="button" data-p="${x.p}">
+      return `<button class="player" type="button" data-p="${x.p}" style="--pc:${color(x.p)}">
         <div class="player-top">${dot(x.p)}<div><h3>${esc(pl.name)}</h3><div class="alias">${esc(alias)}</div></div></div>
         <dl class="pstats">
           <div><dt>Partite</dt><dd>${x.played}</dd></div>

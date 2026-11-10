@@ -325,3 +325,8 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; justif
 .av { justify-items: center; gap: 2px; border-radius: 10px; padding: 4px 4px 2px; }
 .av-name { font: 600 .72rem/1.1 var(--font-display); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
 .av:has(input:checked) .av-name { color: var(--ink); }
+
+/* Scheda giocatore nel colore della sua pallina */
+.player { border-top: 6px solid var(--pc, var(--line)); background: linear-gradient(180deg, color-mix(in srgb, var(--pc, transparent) 14%, var(--surface)) 0, var(--surface) 90px); }
+.player h3 { color: var(--pc, var(--ink)); }
+.player:hover { border-color: var(--pc, var(--focus)); }
