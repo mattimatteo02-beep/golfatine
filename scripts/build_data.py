@@ -62,7 +62,7 @@ def main():
     for r in rows(wb["Super_Battle_Golf"]):
         sbg.setdefault(r["video_id"], []).append(r)
 
-    matches, unreadable = [], []
+    matches, unreadable, pending = [], [], []
     for r in rows(wb["Partite"]):
         game = GAMES.get(r["gioco"])
         if not game:
@@ -126,6 +126,9 @@ def main():
                     parts.append(w)
             results = [{"p": p, "pos": 1 if p in winners else None} for p in parts]
 
+        if not results and str(r["note"] or "").startswith("aggiunta in automatico"):
+            pending.append({**base, "players": ids(r["partecipanti"])})
+            continue
         if not results:
             unreadable.append({**base, "note": r["note"] or "risultato non disponibile"})
             continue
@@ -137,6 +140,7 @@ def main():
 
     matches.sort(key=lambda m: m["date"], reverse=True)
     unreadable.sort(key=lambda m: m["date"], reverse=True)
+    pending.sort(key=lambda m: m["date"], reverse=True)
 
     games = []
     for g in GAMES.values():
@@ -150,6 +154,7 @@ def main():
         "games": games,
         "matches": matches,
         "unreadable": unreadable,
+        "pending": pending,
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(

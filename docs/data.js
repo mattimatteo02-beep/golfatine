@@ -1,7 +1,7 @@
 // File generato da scripts/build_data.py: non modificarlo a mano.
 window.GOLFATINE = {
  "updated": "2026-11-10",
- "lastMatch": "2026-11-08",
+ "lastMatch": "2026-11-10",
  "players": {
   "dread": {
    "name": "Dread",
@@ -115,6 +115,39 @@ window.GOLFATINE = {
   }
  ],
  "matches": [
+  {
+   "id": "QsWnUQ9bbss",
+   "date": "2026-11-10",
+   "season": 2026,
+   "game": "golf",
+   "channel": "Just Rohn JR",
+   "title": "GOLFATINA ARCADE | UN FLIPPER DI B3STEMMIE con DREAD, GABBO, DELUX e MOLLU ⛳",
+   "url": "https://www.youtube.com/watch?v=QsWnUQ9bbss",
+   "map": "Arcade Palace",
+   "results": [
+    {
+     "p": "delux",
+     "pos": 1
+    },
+    {
+     "p": "rohn",
+     "pos": null
+    },
+    {
+     "p": "gabbo",
+     "pos": null
+    },
+    {
+     "p": "dread",
+     "pos": null
+    },
+    {
+     "p": "mollu",
+     "pos": null
+    }
+   ],
+   "note": "riga aggiunta il 10/11: vincitore dall'annuncio finale nel video (\"vince De Luca\"); classifica completa del tabellone da inserire"
+  },
   {
    "id": "PYTqakTqHqA",
    "date": "2026-11-08",
@@ -5776,5 +5809,6 @@ window.GOLFATINE = {
    "url": "https://www.youtube.com/watch?v=Vs7h5mBDihc",
    "note": "risultato non leggibile: nessun tabellone finale nel video"
   }
- ]
+ ],
+ "pending": []
 };

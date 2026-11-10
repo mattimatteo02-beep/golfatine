@@ -112,14 +112,26 @@
 
   function renderLast() {
     const m = D.matches[0];
-    $("last").innerHTML = `<article class="last">
+    // Video appena uscito, trovato in automatico, di cui manca ancora il risultato
+    const fresh = (D.pending || []).filter((v) => v.date >= m.date);
+    const partial = m.results.some((r) => r.pos == null) && m.results.some((r) => r.pos === 1);
+    $("last").innerHTML = fresh.map((v) => `<article class="last fresh">
+      <a class="thumb" href="${esc(v.url)}" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/${esc(v.id)}/hqdefault.jpg" alt="" loading="lazy"></a>
+      <div>
+        <span class="chip">Appena uscita · ${esc(GAME[v.game].name)}</span>
+        <h3>${esc(v.title)}</h3>
+        <div class="meta"><span>${dateIt(v.date)}</span><span>canale ${esc(v.channel)}</span></div>
+        ${v.players && v.players.length ? `<p class="note">In campo: ${v.players.map((p) => esc(name(p))).join(", ")}. Risultato in arrivo.</p>` : `<p class="note">Risultato in arrivo.</p>`}
+        <a class="yt" href="${esc(v.url)}" target="_blank" rel="noopener">Guarda su YouTube ↗</a>
+      </div>
+    </article>`).join("") + `<article class="last">
       <div>
         <span class="chip">${esc(GAME[m.game].name)}</span>
         <h3>${esc(m.title)}</h3>
         <div class="meta"><span>${dateIt(m.date)}</span><span>canale ${esc(m.channel)}</span>${mapLine(m) ? `<span>${mapLine(m)}</span>` : ""}</div>
         <a class="yt" href="${esc(m.url)}" target="_blank" rel="noopener">Guarda su YouTube ↗</a>
       </div>
-      <div>${resultsList(m)}</div>
+      <div>${resultsList(m)}${partial ? `<p class="note small">Per ora si sa solo chi ha vinto: il resto della classifica arriva a breve.</p>` : ""}</div>
     </article>`;
   }
 

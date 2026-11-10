@@ -1,0 +1,43 @@
+# Più volte al giorno controlla i canali del gruppo: se è uscita una nuova golfatina
+# la aggiunge al foglio, rigenera il sito e lo pubblica.
+name: Aggiorna golfatine
+
+on:
+  schedule:
+    - cron: "15 7-23/2 * * *" # ogni 2 ore dalle 8 alle 24 (ora italiana)
+  workflow_dispatch: # pulsante "Run workflow" per lanciarlo a mano
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: aggiorna-golfatine
+  cancel-in-progress: false
+
+jobs:
+  aggiorna:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install openpyxl==3.1.5
+      - name: Cerca nuovi video
+        id: check
+        run: python3 scripts/check_new_videos.py
+      - name: Rigenera i dati del sito
+        if: steps.check.outputs.nuovi != '0'
+        run: python3 scripts/build_data.py
+      - name: Pubblica
+        if: steps.check.outputs.nuovi != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "golfatine-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/golfatine.xlsx docs/data.js
+          git commit -m "Nuove golfatine trovate in automatico"
+          git push
+          gh api -X POST "repos/${{ github.repository }}/pages/builds" || true

@@ -352,3 +352,8 @@ a.strip:hover { border-color: var(--focus); }
 .fans-count { margin: 0; font-size: .9rem; color: var(--muted); }
 .fans-count strong { font: 800 1.25rem/1 var(--font-display); color: var(--pc, var(--ink)); margin-right: 2px; }
 @media (max-width: 560px) { .chip-name { display: none; } }
+.last + .last { margin-top: 14px; }
+.last.fresh { grid-template-columns: minmax(0, 260px) minmax(0, 1fr); align-items: start; }
+.last.fresh .chip { background: var(--flag); color: #1b1a10; }
+.thumb img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; }
+@media (max-width: 720px) { .last.fresh { grid-template-columns: minmax(0, 1fr); } }
