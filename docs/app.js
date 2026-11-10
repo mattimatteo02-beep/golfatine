@@ -5,14 +5,18 @@
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const GAME = Object.fromEntries(D.games.map((g) => [g.id, g]));
-  const COLORS = { delux: "#1f6fb2", dread: "#b23a3a", rohn: "#2f8f5b", mollu: "#c27a12", masseo: "#7a4bb0", gabbo: "#c2185b", jtaz: "#0e8a8a" };
+  // Ogni giocatore ha la sua pallina (stessi colori degli avatar dei fan)
+  const COLORS = { rohn: "#d7263d", dread: "#f06aa8", delux: "#2fa152", gabbo: "#f28c18", mollu: "#8250c8", jtaz: "#1f3f94", masseo: "#4fb3f0" };
+  const DIMPLES = [[11, 9], [17, 8], [22, 11], [8, 15], [14, 14], [20, 16], [25, 17], [10, 21], [16, 20], [22, 22], [13, 26], [19, 26]];
   const core = Object.keys(D.players).filter((p) => !D.players[p].guest);
 
   const name = (p) => (D.players[p] ? D.players[p].name : p);
   const guest = (p) => !D.players[p] || D.players[p].guest;
   const color = (p) => COLORS[p] || "#6b7a70";
   const initial = (p) => name(p).replace(/^il\s+/i, "").charAt(0).toUpperCase();
-  const dot = (p) => `<span class="dot" style="background:${color(p)}" aria-hidden="true">${esc(initial(p))}</span>`;
+  const dot = (p) => COLORS[p]
+    ? `<span class="dot ball-dot" aria-hidden="true"><svg viewBox="0 0 32 32" width="100%" height="100%"><circle cx="16" cy="16" r="15" fill="${COLORS[p]}" stroke="rgba(0,0,0,.25)"/>${DIMPLES.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.4" fill="rgba(0,0,0,.18)"/>`).join("")}<ellipse cx="11" cy="9.5" rx="5" ry="3" fill="rgba(255,255,255,.45)" transform="rotate(-30 11 9.5)"/></svg></span>`
+    : `<span class="dot" style="background:${color(p)}" aria-hidden="true">${esc(initial(p))}</span>`;
   const fmt = (n, d = 1) => n.toLocaleString("it-IT", { minimumFractionDigits: d, maximumFractionDigits: d });
   const par = (n, d = 0) => {
     if (n == null) return "–";
