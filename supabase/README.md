@@ -3,13 +3,13 @@
 Il sito resta statico (GitHub Pages). Login, gettoni, post e puntate stanno su Supabase, che ha un piano gratuito.
 
 1. Crea un account su https://supabase.com e un nuovo progetto (regione Europa, es. Frankfurt).
-2. Apri **SQL Editor**, incolla tutto `supabase/schema.sql` e premi **Run**. Poi fai lo stesso, in ordine, con `supabase/002_nomi_e_avatar.sql` (nome utente e avatar alla registrazione) e `supabase/003_tifosi.sql` (quanti fan tifano ogni giocatore).
+2. Apri **SQL Editor**, incolla tutto `supabase/schema.sql` e premi **Run**. Poi fai lo stesso, in ordine, con `supabase/002_nomi_e_avatar.sql` (nome utente e avatar alla registrazione) `supabase/003_tifosi.sql` (quanti fan tifano ogni giocatore) e `supabase/004_annunci_podio_risultati.sql` (miniature, podio, gestione admin, risultati dal pannello).
 3. In **Authentication → URL Configuration** metti come *Site URL* l'indirizzo del sito
    (es. `https://mattimatteo02-beep.github.io/golfatine/`) e aggiungilo anche tra i *Redirect URLs*.
 4. In **Project Settings → API** copia *Project URL* e la chiave *anon public* dentro `docs/config.js`.
 5. Registrati sul sito con la tua email, scegli il nome utente, poi nel SQL Editor rendi admin il tuo account:
    `update public.profiles set is_admin = true where username = 'TUO_NOME';`
-6. Il pannello admin è su `admin.html` (il link compare accanto al tuo nome quando sei admin).
+6. Il pannello admin è su `admin.html` (il link compare accanto al tuo nome quando sei admin). Da lì puoi anche nominare altri admin, per esempio Melagodo o i moderatori, una volta che si sono registrati.
 
 ## Conferma dell'email
 
@@ -22,6 +22,7 @@ a entrare. Finché non colleghi un SMTP, togli la conferma in
 
 - **Gettoni**: 1.000 alla registrazione, bonus giornaliero di 100 (+20 per ogni giorno di fila, fino a 200),
   salvagente di 200 una volta a settimana se scendi sotto 50. Le cifre si cambiano nella funzione `economy()`.
+- **Podio**: si indovinano primo, secondo e terzo nell'ordine esatto; chi ci riesce si divide tutto il piatto (se nessuno ci riesce, tutti rimborsati). Rende di più perché è più difficile.
 - **Pronostici a montepremi**: tutte le puntate su una domanda formano il piatto; chi indovina se lo divide
   in proporzione a quanto ha puntato. Se nessuno indovina, tutti vengono rimborsati.
 - **Sicurezza**: i fan non possono modificare saldo o puntate direttamente; tutto passa da funzioni del database

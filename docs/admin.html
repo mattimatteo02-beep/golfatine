@@ -17,7 +17,7 @@
       <svg class="flag" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2v20" stroke="currentColor" stroke-width="2" fill="none"/><path d="M7 3l11 4-11 4z" fill="var(--flag)"/></svg>
       <span>Golfatine</span>
     </a>
-    <nav class="nav" aria-label="Sezioni"><a href="#nuovo">Nuovo post</a><a href="#gestione">Gestione</a></nav>
+    <nav class="nav" aria-label="Sezioni"><a href="#nuovo">Nuovo annuncio</a><a href="#gestione">Gestione</a><a href="#risultati">Risultati</a><a href="#admin-list">Admin</a></nav>
     <a class="club-chip" href="index.html#pronostici">Torna al sito</a>
   </div>
 </header>
@@ -25,40 +25,87 @@
 <main class="wrap">
   <section class="section">
     <h1 class="h2">Pannello admin</h1>
-    <p class="note">Qui si pubblicano i post delle prossime golfatine, con le domande su cui i fan puntano. Quando il video esce, chiudi le puntate e indica il risultato: i gettoni vengono pagati in automatico.</p>
+    <p class="note">Qui si annunciano le prossime golfatine con la miniatura del video, e i fan pronosticano chi vince o il podio. Le puntate si chiudono da sole all'ora di uscita del video; quando è uscito, indica il risultato e i gettoni vengono pagati in automatico.</p>
     <div id="club-account"></div>
     <p class="msg" id="gate"></p>
   </section>
 
   <div id="admin" hidden>
     <section id="nuovo" class="section">
-      <h2 class="h2">Nuovo post</h2>
+      <h2 class="h2">Nuovo annuncio</h2>
       <form class="acct admin-form" id="post-form">
-        <label class="field"><span>Titolo</span><input id="f-title" required minlength="3" maxlength="140" placeholder="Golfatina di domenica: chi la spunta?"></label>
+        <label class="field"><span>Titolo</span><input id="f-title" required minlength="3" maxlength="140" placeholder="Domani la golfatina: chi la spunta?"></label>
         <div class="field-row">
           <label class="field"><span>Gioco</span>
             <select id="f-game"><option>Golf With Your Friends</option><option>Super Battle Golf</option><option>UNO</option><option>Trackmania</option><option>GTA V Online</option><option>Altro</option></select></label>
-          <label class="field"><span>Link al video (anche dopo)</span><input id="f-video" type="url" placeholder="https://www.youtube.com/watch?v=…"></label>
+          <label class="field"><span>Il video esce il</span><input id="f-day" type="date" required></label>
+          <label class="field"><span>Alle (ora italiana)</span><input id="f-time" type="time" required value="10:00"></label>
         </div>
-        <label class="field"><span>Descrizione</span><textarea id="f-body" maxlength="1000" placeholder="Chi gioca, su che mappa, quando esce…"></textarea></label>
-        <label class="check"><input type="checkbox" id="f-published" checked> Pubblica subito (altrimenti resta in bozza, visibile solo agli admin)</label>
-
-        <h3 class="h3">Domande</h3>
+        <p class="note small" id="f-close-note"></p>
+        <div class="field-row thumb-row">
+          <label class="field"><span>Miniatura del video</span><input id="f-image" type="file" accept="image/png,image/jpeg,image/webp"></label>
+          <img id="f-image-preview" class="thumb-preview" alt="" hidden>
+        </div>
+        <fieldset class="field-set"><legend>Chi gioca</legend><div class="checks" id="f-players"></div>
+          <label class="field"><span>Altri giocatori o ospiti (separati da virgola)</span><input id="f-extra" placeholder="es. Marza"></label></fieldset>
+        <fieldset class="field-set"><legend>Cosa si pronostica</legend><div class="checks">
+          <label class="check"><input type="checkbox" id="k-winner" checked> Chi vince</label>
+          <label class="check"><input type="checkbox" id="k-podium" checked> Il podio esatto (1°, 2° e 3°: rende di più)</label>
+          <label class="check"><input type="checkbox" id="k-last"> Chi arriva ultimo</label>
+        </div></fieldset>
         <div id="markets"></div>
-        <div class="row">
-          <button class="btn ghost" type="button" id="add-winner">+ Chi vince?</button>
-          <button class="btn ghost" type="button" id="add-last">+ Chi arriva ultimo?</button>
-          <button class="btn ghost" type="button" id="add-custom">+ Domanda libera</button>
-        </div>
-        <div class="row"><button class="btn" type="submit">Pubblica il post</button></div>
+        <div class="row"><button class="btn ghost small" type="button" id="add-custom">+ Domanda libera</button></div>
+        <label class="field"><span>Descrizione (facoltativa)</span><textarea id="f-body" maxlength="1000" placeholder="Su che mappa, cosa aspettarsi…"></textarea></label>
+        <label class="check"><input type="checkbox" id="f-published" checked> Pubblica subito (altrimenti resta in bozza, visibile solo agli admin)</label>
+        <div class="row"><button class="btn" type="submit">Pubblica l'annuncio</button></div>
         <p class="msg" id="post-msg" role="status"></p>
       </form>
     </section>
 
     <section id="gestione" class="section">
       <h2 class="h2">Gestione</h2>
-      <p class="note">Per ogni domanda: chiudi le puntate quando inizia la partita, poi scegli chi ha vinto e paga. Se la partita salta, annulla: tutti vengono rimborsati. Se nessuno ha indovinato, vengono rimborsati tutti.</p>
+      <p class="note">Quando il video è uscito, scegli il risultato e paga. Se la partita salta, annulla: tutti vengono rimborsati. Se nessuno ha indovinato, vengono rimborsati tutti.</p>
       <div class="posts" id="admin-posts"></div>
+    </section>
+
+    <section id="risultati" class="section">
+      <h2 class="h2">Risultati</h2>
+      <p class="note">Copia qui il tabellone finale di una golfatina: compare nelle classifiche del sito entro un'ora (subito se lanci <em>Actions → Aggiorna golfatine → Run workflow</em> su GitHub).</p>
+      <form class="acct admin-form" id="res-form">
+        <div class="field-row">
+          <label class="field"><span>Video</span><select id="r-pick"></select></label>
+          <label class="field"><span>Link o codice del video</span><input id="r-video" required placeholder="https://www.youtube.com/watch?v=…"></label>
+        </div>
+        <div class="field-row">
+          <label class="field"><span>Titolo</span><input id="r-title" required maxlength="200"></label>
+          <label class="field"><span>Data</span><input id="r-date" type="date" required></label>
+          <label class="field"><span>Canale</span><input id="r-channel" maxlength="80"></label>
+          <label class="field"><span>Gioco</span><select id="r-game"><option value="golf">Golf With Your Friends</option><option value="sbg">Super Battle Golf</option><option value="uno">UNO</option></select></label>
+        </div>
+        <div class="field-row" id="r-golf-head">
+          <label class="field"><span>Mappa</span><input id="r-map" list="r-maps" maxlength="80"><datalist id="r-maps"></datalist></label>
+          <label class="field"><span>Buche</span><select id="r-holes"><option>18</option><option>9</option><option>12</option><option>6</option></select></label>
+        </div>
+        <fieldset class="field-set"><legend>Giocatori</legend><div class="checks" id="r-players"></div></fieldset>
+        <div class="scroll"><table class="res-grid" id="r-grid"></table></div>
+        <div class="row"><button class="btn" type="submit">Salva il risultato</button><button class="btn ghost" type="reset" id="r-clear">Svuota</button></div>
+        <p class="msg" id="res-msg" role="status"></p>
+      </form>
+      <h3 class="h3">Risultati inseriti dal sito</h3>
+      <div id="res-list"></div>
+    </section>
+
+    <section id="admin-list" class="section">
+      <h2 class="h2">Admin</h2>
+      <p class="note">Gli admin possono pubblicare annunci, pagare i pronostici e inserire i risultati. Per aggiungere qualcuno (per esempio Melagodo o un moderatore), deve prima registrarsi sul sito; poi scrivi qui il suo nome utente.</p>
+      <div class="acct">
+        <div id="admins"></div>
+        <form class="field-row" id="admin-form">
+          <label class="field"><span>Nome utente</span><input id="a-name" required pattern="[A-Za-z0-9_.]{3,20}" maxlength="20"></label>
+          <button class="btn" type="submit">Rendi admin</button>
+        </form>
+        <p class="msg" id="admin-msg" role="status"></p>
+      </div>
     </section>
   </div>
 </main>
