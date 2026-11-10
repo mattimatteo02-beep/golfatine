@@ -33,47 +33,136 @@
     });
   }
 
-  // Pannello account: login con link via email, scelta nome, saldo e bonus
+  // Avatar: palline da golf colorate
+  const AVATARS = [
+    ["rossa", "#d7263d", "Rossa"], ["rosa", "#f06aa8", "Rosa"], ["verde", "#2fa152", "Verde"],
+    ["arancione", "#f28c18", "Arancione"], ["viola", "#8250c8", "Viola"],
+    ["blu-scuro", "#1f3f94", "Blu scuro"], ["blu-chiaro", "#4fb3f0", "Blu chiaro"],
+  ];
+  const DIMPLES = [[11, 9], [17, 8], [22, 11], [8, 15], [14, 14], [20, 16], [25, 17], [10, 21], [16, 20], [22, 22], [13, 26], [19, 26]];
+  function ball(av, size = 32) {
+    const a = AVATARS.find((x) => x[0] === av) || AVATARS[0];
+    return `<svg class="ball" width="${size}" height="${size}" viewBox="0 0 32 32" role="img" aria-label="Pallina ${a[2].toLowerCase()}">
+      <circle cx="16" cy="16" r="15" fill="${a[1]}" stroke="rgba(0,0,0,.25)" stroke-width="1"/>
+      ${DIMPLES.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.4" fill="rgba(0,0,0,.18)"/>`).join("")}
+      <ellipse cx="11" cy="9.5" rx="5" ry="3" fill="rgba(255,255,255,.45)" transform="rotate(-30 11 9.5)"/>
+    </svg>`;
+  }
+  function avatarPicker(name, current) {
+    return `<fieldset class="avatars"><legend>Scegli la tua pallina</legend>
+      ${AVATARS.map(([id, , label]) => `<label class="av" title="${label}"><input type="radio" name="${name}" value="${id}" ${id === (current || "rossa") ? "checked" : ""}>${ball(id, 40)}<span class="sr">${label}</span></label>`).join("")}
+    </fieldset>`;
+  }
+  const authError = (e) => {
+    const m = (e && e.message) || "";
+    if (/invalid login credentials/i.test(m)) return "Email o password sbagliate.";
+    if (/email not confirmed/i.test(m)) return "Devi prima confermare l'email: controlla la posta (anche lo spam).";
+    if (/already registered|already exists/i.test(m)) return "Esiste già un account con questa email: accedi.";
+    if (/password should be at least/i.test(m)) return "La password deve avere almeno 6 caratteri.";
+    if (/rate limit|too many/i.test(m)) return "Troppi tentativi, riprova fra qualche minuto.";
+    return errText(e);
+  };
+  const NAME_RE = /^[A-Za-z0-9_.]{3,20}$/;
+
+  let authMode = "registrati";
+  let pickingAvatar = false;
+
+  // Pannello account: registrazione, accesso, scelta nome e avatar, saldo e bonus
   function accountPanel(el, onChange) {
     if (!sb) {
       el.innerHTML = `<div class="acct"><p class="acct-title">Area fan in arrivo</p><p class="note">Login, gettoni e pronostici si attivano appena il sito viene collegato al database.</p></div>`;
       return;
     }
     const p = state.profile;
+    const redirect = location.origin + location.pathname;
     if (!state.session) {
-      el.innerHTML = `<form class="acct" id="login-form">
-        <p class="acct-title">Accedi per pronosticare</p>
-        <p class="note">Ti mandiamo un link via email, niente password. Alla prima registrazione ricevi 1.000 gettoni.</p>
-        <div class="row"><label class="sr" for="login-email">Email</label>
-          <input id="login-email" type="email" required placeholder="la-tua@email.it" autocomplete="email">
-          <button class="btn" type="submit">Mandami il link</button></div>
-        <p class="msg" id="login-msg" role="status"></p>
-      </form>`;
-      el.querySelector("#login-form").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const msg = el.querySelector("#login-msg");
-        msg.textContent = "Invio in corso…";
-        const { error } = await sb.auth.signInWithOtp({
-          email: el.querySelector("#login-email").value.trim(),
-          options: { emailRedirectTo: location.origin + location.pathname },
+      const tabs = `<div class="seg auth-tabs" role="tablist">
+        <button type="button" role="tab" aria-selected="${authMode === "registrati"}" data-mode="registrati">Registrati</button>
+        <button type="button" role="tab" aria-selected="${authMode === "accedi"}" data-mode="accedi">Accedi</button></div>`;
+      el.innerHTML = authMode === "registrati"
+        ? `<form class="acct" id="signup-form">${tabs}
+          <p class="note">Crea il tuo account e ricevi subito 1.000 gettoni.</p>
+          <label class="field"><span>Nome utente</span><input id="su-name" required pattern="[A-Za-z0-9_.]{3,20}" maxlength="20" autocomplete="username" placeholder="es. golfista_99"></label>
+          <p class="msg small" id="su-name-msg"></p>
+          <label class="field"><span>Email</span><input id="su-email" type="email" required autocomplete="email" placeholder="la-tua@email.it"></label>
+          <label class="field"><span>Password (almeno 6 caratteri)</span><input id="su-pass" type="password" required minlength="6" autocomplete="new-password"></label>
+          ${avatarPicker("su-avatar")}
+          <button class="btn cta wide" type="submit">Crea account</button>
+          <p class="msg" id="su-msg" role="status"></p>
+        </form>`
+        : `<form class="acct" id="login-form">${tabs}
+          <label class="field"><span>Email</span><input id="li-email" type="email" required autocomplete="email" placeholder="la-tua@email.it"></label>
+          <label class="field"><span>Password</span><input id="li-pass" type="password" autocomplete="current-password"></label>
+          <button class="btn cta wide" type="submit">Entra</button>
+          <button class="linkish" type="button" id="li-magic">Password dimenticata? Entra con un link via email</button>
+          <p class="msg" id="li-msg" role="status"></p>
+        </form>`;
+      el.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => { authMode = b.dataset.mode; accountPanel(el, onChange); }));
+
+      const su = el.querySelector("#signup-form");
+      if (su) {
+        const nameIn = su.querySelector("#su-name"), nameMsg = su.querySelector("#su-name-msg");
+        const check = async () => {
+          const v = nameIn.value.trim();
+          if (!v) { nameMsg.textContent = ""; return true; }
+          if (!NAME_RE.test(v)) { nameMsg.textContent = "Da 3 a 20 caratteri: lettere, numeri, punto e trattino basso."; return false; }
+          const { data } = await sb.rpc("username_available", { p_name: v });
+          nameMsg.textContent = data ? "Nome libero ✓" : "Nome già preso, scegline un altro.";
+          return Boolean(data);
+        };
+        nameIn.addEventListener("change", check);
+        su.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const msg = su.querySelector("#su-msg");
+          if (!(await check())) { msg.textContent = "Controlla il nome utente."; return; }
+          msg.textContent = "Creazione dell'account…";
+          const avatar = (su.querySelector('input[name="su-avatar"]:checked') || {}).value || "rossa";
+          const { data, error } = await sb.auth.signUp({
+            email: su.querySelector("#su-email").value.trim(),
+            password: su.querySelector("#su-pass").value,
+            options: { emailRedirectTo: redirect, data: { username: nameIn.value.trim(), avatar } },
+          });
+          if (error) { msg.textContent = authError(error); return; }
+          if (data.session) { state.session = data.session; await loadProfile(); onChange(); return; }
+          msg.textContent = "Quasi fatto: ti abbiamo mandato un'email. Tocca il link per confermare e sei dentro.";
         });
-        msg.textContent = error ? errText(error) : "Fatto: apri l'email e tocca il link per entrare.";
-      });
+      }
+      const li = el.querySelector("#login-form");
+      if (li) {
+        const msg = li.querySelector("#li-msg");
+        li.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const pass = li.querySelector("#li-pass").value;
+          if (!pass) { msg.textContent = "Scrivi la password, oppure usa il link via email qui sotto."; return; }
+          msg.textContent = "Accesso…";
+          const { data, error } = await sb.auth.signInWithPassword({ email: li.querySelector("#li-email").value.trim(), password: pass });
+          if (error) { msg.textContent = authError(error); return; }
+          state.session = data.session; await loadProfile(); onChange();
+        });
+        li.querySelector("#li-magic").addEventListener("click", async () => {
+          const email = li.querySelector("#li-email").value.trim();
+          if (!email) { msg.textContent = "Scrivi prima la tua email."; return; }
+          msg.textContent = "Invio in corso…";
+          const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: redirect, shouldCreateUser: false } });
+          msg.textContent = error ? authError(error) : "Fatto: apri l'email e tocca il link per entrare.";
+        });
+      }
       return;
     }
     if (!p) { el.innerHTML = `<div class="acct"><p class="note">Caricamento del profilo…</p></div>`; return; }
     if (!p.username) {
       el.innerHTML = `<form class="acct" id="name-form">
-        <p class="acct-title">Scegli il tuo nome</p>
-        <p class="note">Comparirà nella classifica dei fan. Da 3 a 20 caratteri: lettere, numeri, punto e trattino basso.</p>
-        <div class="row"><label class="sr" for="name-input">Nome utente</label>
-          <input id="name-input" required pattern="[A-Za-z0-9_.]{3,20}" maxlength="20" autocomplete="nickname">
-          <button class="btn" type="submit">Salva</button></div>
+        <p class="acct-title">Completa il tuo profilo</p>
+        <label class="field"><span>Nome utente (comparirà nella classifica dei fan)</span>
+          <input id="name-input" required pattern="[A-Za-z0-9_.]{3,20}" maxlength="20" autocomplete="username"></label>
+        ${avatarPicker("pf-avatar", p.avatar)}
+        <button class="btn cta wide" type="submit">Salva</button>
         <p class="msg" id="name-msg" role="status"></p>
       </form>`;
       el.querySelector("#name-form").addEventListener("submit", async (e) => {
         e.preventDefault();
-        const { error } = await sb.from("profiles").update({ username: el.querySelector("#name-input").value.trim() }).eq("id", p.id);
+        const avatar = (el.querySelector('input[name="pf-avatar"]:checked') || {}).value || "rossa";
+        const { error } = await sb.from("profiles").update({ username: el.querySelector("#name-input").value.trim(), avatar }).eq("id", p.id);
         if (error) { el.querySelector("#name-msg").textContent = error.code === "23505" ? "Nome già preso, scegline un altro." : errText(error); return; }
         await loadProfile(); onChange();
       });
@@ -82,10 +171,13 @@
     const claimed = p.last_daily === todayRome();
     const canRescue = p.balance < 50;
     el.innerHTML = `<div class="acct acct-in">
-      <div>
-        <p class="bal-label">Il tuo saldo, ${esc(p.username)}</p>
-        <p class="bal"><span class="num">${n(p.balance)}</span> gettoni</p>
-        ${p.daily_streak > 1 ? `<p class="note small">Serie di ${p.daily_streak} giorni di fila</p>` : ""}
+      <div class="me">
+        <button type="button" class="me-ball" id="change-avatar" title="Cambia pallina">${ball(p.avatar, 56)}</button>
+        <div>
+          <p class="bal-label">Il tuo saldo, ${esc(p.username)}</p>
+          <p class="bal"><span class="num">${n(p.balance)}</span> gettoni</p>
+          ${p.daily_streak > 1 ? `<p class="note small">Serie di ${p.daily_streak} giorni di fila</p>` : ""}
+        </div>
       </div>
       <div class="acct-actions">
         ${claimed ? "" : '<button class="btn cta" type="button" id="daily">Prendi il bonus di oggi</button>'}
@@ -93,8 +185,15 @@
         ${p.is_admin ? '<a class="btn ghost" href="admin.html">Pannello admin</a>' : ""}
         <button class="btn ghost" type="button" id="logout">Esci</button>
       </div>
+      ${pickingAvatar ? `<div class="avatar-edit">${avatarPicker("ed-avatar", p.avatar)}</div>` : ""}
       <p class="msg" id="acct-msg" role="status"></p>
     </div>`;
+    el.querySelector("#change-avatar").addEventListener("click", () => { pickingAvatar = !pickingAvatar; accountPanel(el, onChange); });
+    el.querySelectorAll('input[name="ed-avatar"]').forEach((r) => r.addEventListener("change", async () => {
+      const { error } = await sb.from("profiles").update({ avatar: r.value }).eq("id", p.id);
+      if (error) { el.querySelector("#acct-msg").textContent = errText(error); return; }
+      pickingAvatar = false; await loadProfile(); onChange();
+    }));
     const msg = el.querySelector("#acct-msg");
     const daily = el.querySelector("#daily");
     if (daily) daily.addEventListener("click", async () => {
@@ -215,7 +314,7 @@
     }
     const { data: fans } = await sb.from("fan_leaderboard").select("*").limit(20);
     lb.innerHTML = fans && fans.length
-      ? `<table class="lb fans"><thead><tr><th>Pos</th><th>Fan</th><th>Gettoni</th><th>Pronostici vinti</th></tr></thead><tbody>${fans.map((f, i) => `<tr${state.profile && f.username === state.profile.username ? ' class="first"' : ""}><td class="pos">${i + 1}</td><td>${esc(f.username)}</td><td>${n(f.balance)}</td><td>${f.wins} su ${f.bets}</td></tr>`).join("")}</tbody></table>`
+      ? `<table class="lb fans"><thead><tr><th>Pos</th><th>Fan</th><th>Gettoni</th><th>Pronostici vinti</th></tr></thead><tbody>${fans.map((f, i) => `<tr${state.profile && f.username === state.profile.username ? ' class="first"' : ""}><td class="pos">${i + 1}</td><td><span class="fan">${ball(f.avatar, 22)}${esc(f.username)}</span></td><td>${n(f.balance)}</td><td>${f.wins} su ${f.bets}</td></tr>`).join("")}</tbody></table>`
       : `<p class="empty">Nessun fan in classifica per ora.</p>`;
   }
 
@@ -223,7 +322,8 @@
     const chip = document.getElementById("club-chip");
     if (!chip) return;
     const p = state.profile;
-    chip.textContent = !sb ? "Area fan" : p && p.username ? `${n(p.balance)} gettoni` : state.session ? "Scegli il nome" : "Accedi";
+    if (p && p.username) chip.innerHTML = `${ball(p.avatar, 20)}<span>${n(p.balance)} gettoni</span>`;
+    else chip.textContent = !sb ? "Area fan" : state.session ? "Completa il profilo" : "Accedi";
   }
 
   // Scelta dell'opzione, importo e puntata
@@ -265,7 +365,7 @@
     clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 2600);
   });
 
-  window.Club = { sb, configured, state, init, loadProfile, accountPanel, loadPosts, marketStatus, esc, n, when, errText };
+  window.Club = { ball, sb, configured, state, init, loadProfile, accountPanel, loadPosts, marketStatus, esc, n, when, errText };
 
   if (document.getElementById("club-posts")) init(renderPronostici);
 })();

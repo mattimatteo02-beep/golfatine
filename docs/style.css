@@ -304,3 +304,20 @@ textarea { width: 100%; min-height: 80px; resize: vertical; }
 .btn.wide { width: 100%; }
 a.btn { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
 .opt.admin-opt { grid-template-columns: minmax(0, 1fr) auto auto; }
+
+/* ---------- Registrazione e avatar ---------- */
+.auth-tabs { justify-self: start; }
+.avatars { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.avatars legend { font: 600 .75rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; padding: 0; }
+.av { position: relative; cursor: pointer; border-radius: 50%; padding: 3px; border: 2px solid transparent; display: inline-grid; }
+.av input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.av:has(input:checked) { border-color: var(--ink); }
+.av:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+.ball { display: block; flex: none; }
+.me { display: flex; gap: 14px; align-items: center; min-width: 0; }
+.me-ball { border: 0; background: none; padding: 0; cursor: pointer; border-radius: 50%; }
+.avatar-edit { grid-column: 1 / -1; }
+.club-chip { display: inline-flex; align-items: center; gap: 6px; }
+.fan { display: inline-flex; align-items: center; gap: 8px; }
+.linkish { background: none; border: 0; padding: 0; color: var(--muted); text-decoration: underline; cursor: pointer; font: inherit; font-size: .9rem; justify-self: start; }
+.msg.small { font-size: .85rem; min-height: 0; }
