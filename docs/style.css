@@ -321,3 +321,7 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; justif
 .fan { display: inline-flex; align-items: center; gap: 8px; }
 .linkish { background: none; border: 0; padding: 0; color: var(--muted); text-decoration: underline; cursor: pointer; font: inherit; font-size: .9rem; justify-self: start; }
 .msg.small { font-size: .85rem; min-height: 0; }
+.ball-dot { background: none; }
+.av { justify-items: center; gap: 2px; border-radius: 10px; padding: 4px 4px 2px; }
+.av-name { font: 600 .72rem/1.1 var(--font-display); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.av:has(input:checked) .av-name { color: var(--ink); }

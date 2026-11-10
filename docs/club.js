@@ -35,9 +35,9 @@
 
   // Avatar: palline da golf colorate
   const AVATARS = [
-    ["rossa", "#d7263d", "Rossa"], ["rosa", "#f06aa8", "Rosa"], ["verde", "#2fa152", "Verde"],
-    ["arancione", "#f28c18", "Arancione"], ["viola", "#8250c8", "Viola"],
-    ["blu-scuro", "#1f3f94", "Blu scuro"], ["blu-chiaro", "#4fb3f0", "Blu chiaro"],
+    ["rossa", "#d7263d", "Rossa", "Rohn"], ["rosa", "#f06aa8", "Rosa", "Dread"], ["verde", "#2fa152", "Verde", "Delux"],
+    ["arancione", "#f28c18", "Arancione", "Gabbo"], ["viola", "#8250c8", "Viola", "Mollu"],
+    ["blu-scuro", "#1f3f94", "Blu scuro", "JTaz"], ["blu-chiaro", "#4fb3f0", "Blu chiaro", "Masseo"],
   ];
   const DIMPLES = [[11, 9], [17, 8], [22, 11], [8, 15], [14, 14], [20, 16], [25, 17], [10, 21], [16, 20], [22, 22], [13, 26], [19, 26]];
   function ball(av, size = 32) {
@@ -49,8 +49,8 @@
     </svg>`;
   }
   function avatarPicker(name, current) {
-    return `<fieldset class="avatars"><legend>Scegli la tua pallina</legend>
-      ${AVATARS.map(([id, , label]) => `<label class="av" title="${label}"><input type="radio" name="${name}" value="${id}" ${id === (current || "rossa") ? "checked" : ""}>${ball(id, 40)}<span class="sr">${label}</span></label>`).join("")}
+    return `<fieldset class="avatars"><legend>Scegli la tua pallina: tifi per chi?</legend>
+      ${AVATARS.map(([id, , label, player]) => `<label class="av" title="${label}, la pallina di ${player}"><input type="radio" name="${name}" value="${id}" ${id === (current || "rossa") ? "checked" : ""}>${ball(id, 40)}<span class="av-name">${player}</span></label>`).join("")}
     </fieldset>`;
   }
   const authError = (e) => {
