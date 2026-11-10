@@ -357,3 +357,26 @@ a.strip:hover { border-color: var(--focus); }
 .last.fresh .chip { background: var(--flag); color: #1b1a10; }
 .thumb img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; }
 @media (max-width: 720px) { .last.fresh { grid-template-columns: minmax(0, 1fr); } }
+
+/* Annunci con miniatura, podio, pannello risultati */
+.post-thumb { display: block; width: 100%; max-width: 560px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); }
+.thumb-row { align-items: center; }
+.thumb-preview { width: 200px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); }
+.field-set { border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px 14px; margin: 0; display: grid; gap: 10px; min-width: 0; }
+.field-set legend { font: 600 .75rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 0 4px; }
+.checks { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.checks .check.guest { color: var(--muted); }
+.opt.pod { grid-template-columns: minmax(0, 1fr) auto; }
+.pod-badge { font: 800 1rem/1 var(--font-display); background: var(--flag); color: #1b1a10; border-radius: 999px; padding: 4px 9px; }
+.pod-badge.real { background: var(--ink); color: var(--surface); }
+.my-podiums { margin: 0; padding-left: 18px; font-size: .9rem; display: grid; gap: 4px; }
+.res-grid { border-collapse: collapse; font-size: .9rem; }
+.res-grid th, .res-grid td { padding: 3px; text-align: center; white-space: nowrap; }
+.res-grid tbody th { text-align: left; padding-right: 10px; font-weight: 600; }
+.res-grid input { width: 3.1em; padding: 6px 2px; text-align: center; }
+.res-grid .par-row input { background: color-mix(in srgb, var(--flag) 22%, var(--surface)); }
+.res-grid .tot { font: 700 1rem/1 var(--font-display); min-width: 2.5em; }
+.res-grid input.pos { width: 4em; }
+.admin-form > *, .acct > * { min-width: 0; }
+.admin-form input, .admin-form select, .admin-form textarea { max-width: 100%; }
+[hidden] { display: none !important; }

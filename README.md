@@ -28,7 +28,7 @@ UNO conta solo il vincitore del video. Ospiti esclusi dalle classifiche. GTA esc
 
 ## Aggiornamento automatico
 
-`.github/workflows/aggiorna-golfatine.yml` gira ogni 2 ore (dalle 8 a mezzanotte, ora italiana) e si può lanciare a mano da
+`.github/workflows/aggiorna-golfatine.yml` gira ogni ora (dalle 7 a mezzanotte, ora italiana) e si può lanciare a mano da
 **Actions → Aggiorna golfatine → Run workflow**. Legge i feed RSS dei canali del gruppo (`scripts/check_new_videos.py`):
 ogni nuovo video con "golf" nel titolo entra nel foglio come "in arrivo", il sito lo mostra subito in "Ultima golfatina"
 e lo pubblica. Il risultato (foglio Golf) si aggiunge poi a mano; la nota "aggiunta in automatico" va tolta quando c'è.

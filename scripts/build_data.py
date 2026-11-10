@@ -12,7 +12,11 @@ Regole (le stesse del foglio "Classifiche" del modello):
 """
 import datetime
 import json
+import os
 import pathlib
+import re
+import sys
+import urllib.request
 
 import openpyxl
 
@@ -25,6 +29,73 @@ GAMES = {
     "Super Battle Golf": {"id": "sbg", "name": "Super Battle Golf", "short": "Super Battle Golf", "mode": "posizioni"},
     "UNO": {"id": "uno", "name": "UNO", "short": "UNO", "mode": "vincitore"},
 }
+
+
+GAME_IDS = {g["id"] for g in GAMES.values()}
+
+
+def site_results():
+    """Risultati inseriti dal pannello admin (tabella match_results su Supabase).
+
+    Usa l'indirizzo e la chiave pubblica di docs/config.js. Se il database non risponde
+    si va avanti con i soli dati del foglio."""
+    if os.environ.get("GOLFATINE_OFFLINE"):
+        return []
+    cfg = (ROOT / "docs" / "config.js").read_text(encoding="utf-8")
+    url = re.search(r'supabaseUrl:\s*"([^"]+)"', cfg)
+    key = re.search(r'supabaseAnonKey:\s*"([^"]+)"', cfg)
+    if not url or not key:
+        return []
+    req = urllib.request.Request(url.group(1) + "/rest/v1/match_results?select=*",
+                                 headers={"apikey": key.group(1), "Authorization": "Bearer " + key.group(1)})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return json.loads(r.read())
+    except Exception as e:  # noqa: BLE001
+        print(f"risultati dal sito non letti ({e}): uso solo il foglio", file=sys.stderr)
+        return []
+
+
+def match_from_site(r, maps_par):
+    """Trasforma una riga di match_results nel formato delle partite del sito."""
+    game = r.get("game") or "golf"
+    if game not in GAME_IDS:
+        return None
+    date = str(r["date"])[:10]
+    m = {"id": r["video_id"], "date": date, "season": int(date[:4]), "game": game,
+         "channel": r.get("channel") or "", "title": r["title"],
+         "url": f"https://www.youtube.com/watch?v={r['video_id']}"}
+    par_list = [x for x in (r.get("par") or []) if isinstance(x, int)]
+    par = sum(par_list) if par_list else maps_par.get(r.get("map"))
+    if r.get("map"):
+        m["map"] = r["map"]
+    if par and not (30 <= par <= 100):
+        par = None
+    results = []
+    for pl in r.get("players") or []:
+        res = {"p": pl.get("p"), "pos": pl.get("pos")}
+        holes = [h for h in (pl.get("holes") or []) if isinstance(h, int) and h > 0]
+        if game == "golf" and holes:
+            res["strokes"] = sum(holes)
+            res["hio"] = sum(1 for h in holes if h == 1)
+            if par and len(holes) == len(par_list or holes):
+                res["toPar"] = res["strokes"] - par
+        if res["p"]:
+            results.append(res)
+    if game == "golf" and any("strokes" in x for x in results) and all(x["pos"] is None for x in results):
+        # posizioni dai colpi totali (pari merito = stessa posizione)
+        tot = sorted(x["strokes"] for x in results if "strokes" in x)
+        for x in results:
+            if "strokes" in x:
+                x["pos"] = tot.index(x["strokes"]) + 1
+    if not results:
+        return None
+    if par and game == "golf":
+        m["par"] = par
+    results.sort(key=lambda x: (x["pos"] is None, x["pos"] or 0))
+    m["results"] = results
+    m["note"] = "risultato inserito dal pannello admin"
+    return m
 
 
 def rows(ws):
@@ -54,6 +125,10 @@ def main():
     maps = {}
     for r in rows(wb["Golf_Mappe"]):
         maps[r["mappa"]] = {"par": r["par_totale"], "holes": r["numero_buche"]}
+        n = r["numero_buche"] if isinstance(r["numero_buche"], int) else 0
+        pars = [r.get(f"par_b{i}") for i in range(1, n + 1)]
+        if n and all(isinstance(x, int) for x in pars):
+            maps[r["mappa"]]["pars"] = pars
 
     golf = {}
     for r in rows(wb["Golf"]):
@@ -138,6 +213,18 @@ def main():
             base["note"] = r["note"]
         matches.append(base)
 
+    # I risultati inseriti dal sito hanno la precedenza su quelli del foglio
+    maps_par = {k: v["par"] for k, v in maps.items() if isinstance(v.get("par"), (int, float))}
+    for r in site_results():
+        sm = match_from_site(r, maps_par)
+        if not sm:
+            continue
+        if sm["results"] and all(x["p"] in players for x in sm["results"]):
+            matches = [x for x in matches if x["id"] != sm["id"]]
+            unreadable = [x for x in unreadable if x["id"] != sm["id"]]
+            pending = [x for x in pending if x["id"] != sm["id"]]
+            matches.append(sm)
+
     matches.sort(key=lambda m: m["date"], reverse=True)
     unreadable.sort(key=lambda m: m["date"], reverse=True)
     pending.sort(key=lambda m: m["date"], reverse=True)
@@ -155,13 +242,20 @@ def main():
         "matches": matches,
         "unreadable": unreadable,
         "pending": pending,
+        # par di ogni buca delle mappe conosciute (serve al modulo dei risultati nel pannello admin)
+        "maps": {k: v["pars"] for k, v in sorted(maps.items()) if v.get("pars")},
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(
-        "// File generato da scripts/build_data.py: non modificarlo a mano.\n"
-        "window.GOLFATINE = " + json.dumps(data, ensure_ascii=False, indent=1) + ";\n",
-        encoding="utf-8",
-    )
+    text = lambda d: ("// File generato da scripts/build_data.py: non modificarlo a mano.\n"  # noqa: E731
+                      "window.GOLFATINE = " + json.dumps(d, ensure_ascii=False, indent=1) + ";\n")
+    # Se cambia solo la data di aggiornamento, il file resta com'è (niente pubblicazioni inutili)
+    if OUT.exists():
+        old = OUT.read_text(encoding="utf-8")
+        m = re.search(r'"updated": "([0-9-]+)"', old)
+        if m and old == text({**data, "updated": m.group(1)}):
+            print("nessuna novità nei dati")
+            return
+    OUT.write_text(text(data), encoding="utf-8")
     print(f"{len(matches)} partite, {len(unreadable)} senza risultato -> {OUT.relative_to(ROOT)}")
 
 

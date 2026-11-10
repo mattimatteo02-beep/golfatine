@@ -297,7 +297,7 @@
       m.textContent = "Password cambiata.";
     });
     const [{ data: bets, error: e1 }, { data: tx, error: e2 }] = await Promise.all([
-      sb.from("bets").select("amount, payout, created_at, options(label), markets(question, status, winning_option), option_id").eq("user_id", p.id).order("created_at", { ascending: false }).limit(30),
+      sb.from("bets").select("amount, payout, created_at, picks, options(label), markets(question, status, kind, options(id, label)), option_id").eq("user_id", p.id).order("created_at", { ascending: false }).limit(30),
       sb.from("transactions").select("amount, reason, created_at").eq("user_id", p.id).order("created_at", { ascending: false }).limit(20),
     ]);
     const betsEl = el.querySelector("#my-bets"), txEl = el.querySelector("#my-tx");
@@ -308,7 +308,9 @@
           const mk = b.markets || {};
           const st = mk.status === "pagato" ? (b.payout > 0 ? `<span class="pos-amt">+${n(b.payout)}</span>` : `<span class="neg-amt">perso</span>`)
             : mk.status === "annullato" ? "rimborsato" : "in attesa";
-          return `<li><span><strong>${esc((b.options || {}).label || "")}</strong> · ${esc(mk.question || "")}<br><span class="note small">${shortDate(b.created_at)} · puntati ${n(b.amount)}</span></span><span class="hist-amt">${st}</span></li>`;
+          const lab = (id) => ((mk.options || []).find((o) => o.id === id) || {}).label || "?";
+          const what = b.picks ? "Podio " + b.picks.map((id, i) => `${i + 1}° ${lab(id)}`).join(", ") : (b.options || {}).label || "";
+          return `<li><span><strong>${esc(what)}</strong> · ${esc(mk.question || "")}<br><span class="note small">${shortDate(b.created_at)} · puntati ${n(b.amount)}</span></span><span class="hist-amt">${st}</span></li>`;
         }).join("")}</ul>`;
     txEl.innerHTML = e2 ? `<p class="note small">${esc(errText(e2))}</p>`
       : `<ul class="hist">${(tx || []).map((t) => `<li><span>${REASONS[t.reason] || esc(t.reason)}<br><span class="note small">${shortDate(t.created_at)}</span></span><span class="hist-amt ${t.amount > 0 ? "pos-amt" : "neg-amt"}">${t.amount > 0 ? "+" : ""}${n(t.amount)}</span></li>`).join("")}</ul>`;
@@ -371,8 +373,55 @@
   }
 
   const picked = {}; // domanda -> opzione scelta
+  const podPicks = {}; // domanda del podio -> [1°, 2°, 3°]
+  const lastArgs = {}; // per ridisegnare una sola domanda
+
+  // Pronostico del podio: si scelgono in ordine primo, secondo e terzo
+  function podiumHtml(m, totals, myBets, canBet) {
+    lastArgs[m.id] = [m, totals, myBets, canBet];
+    const opts = (m.options || []).slice().sort((a, b) => a.sort - b.sort || a.id - b.id);
+    const label = (id) => (opts.find((o) => o.id === id) || {}).label || "?";
+    const pool = opts.reduce((s, o) => s + Number((totals[o.id] || {}).total || 0), 0);
+    const bettors = opts.reduce((s, o) => s + Number((totals[o.id] || {}).bettors || 0), 0);
+    const st = marketStatus(m);
+    const open = st.open && canBet;
+    const mine = myBets.filter((b) => b.market_id === m.id);
+    const chosen = podPicks[m.id] || [];
+    const real = m.status === "pagato" && m.podium ? m.podium : null;
+    const rows = opts.map((o) => {
+      const at = chosen.indexOf(o.id);
+      const realAt = real ? real.indexOf(o.id) : -1;
+      const badge = at >= 0 ? `<span class="pod-badge">${at + 1}°</span>` : realAt >= 0 ? `<span class="pod-badge real">${realAt + 1}°</span>` : "";
+      const inner = `<span class="opt-label">${esc(o.label)}</span>${badge}`;
+      return open
+        ? `<li><button type="button" class="opt pick pod ${at >= 0 ? "chosen" : ""}" data-podpick="${o.id}" data-market="${m.id}" aria-pressed="${at >= 0}">${inner}</button></li>`
+        : `<li class="opt pod ${realAt >= 0 ? "won" : ""}">${inner}</li>`;
+    }).join("");
+    const myList = mine.map((b) => `<li>${(b.picks || []).map((id, i) => `${i + 1}° ${esc(label(id))}`).join(" · ")} — ${n(b.amount)} gettoni${b.payout != null ? (b.payout > 0 ? ` <span class="pos-amt">vinti ${n(b.payout)}</span>` : m.status === "annullato" ? " (rimborsati)" : " (perso)") : ""}</li>`).join("");
+    const next = ["primo", "secondo", "terzo"][chosen.length];
+    return `<div class="market podium" data-market-id="${m.id}">
+      <div class="market-head"><h4>${esc(m.question)}</h4><span class="market-state ${st.open ? "is-open" : ""}">${st.open ? "Chiude " + when(m.closes_at) : st.label}</span></div>
+      ${open ? `<p class="note small">${chosen.length < 3 ? `1. Tocca chi arriva <strong>${next}</strong>` : "Podio scelto: tocca un nome per cambiarlo"}. Vinci solo se indovini l'ordine esatto, per questo rende molto di più.</p>` : ""}
+      <ol class="opts">${rows}</ol>
+      ${open ? `<div class="bet-box" ${chosen.length === 3 ? "" : "hidden"}>
+        <p class="note small">2. Quanti gettoni punti?</p>
+        <div class="row">
+          ${[50, 100, 250].map((v) => `<button type="button" class="btn ghost small" data-amt="${v}" data-market="${m.id}">${v}</button>`).join("")}
+          <label class="sr" for="amt-${m.id}">Gettoni</label>
+          <input id="amt-${m.id}" class="amt" type="number" min="10" step="10" value="${esc(podAmt[m.id] || 100)}" inputmode="numeric">
+        </div>
+        <button type="button" class="btn cta wide" data-podbet="${m.id}">Punta su questo podio</button>
+      </div>` : ""}
+      ${!canBet && st.open ? `<p class="note small"><a href="#profilo" class="link-login">Accedi</a> per puntare.</p>` : ""}
+      ${myList ? `<ul class="my-podiums">${myList}</ul>` : ""}
+      <p class="msg" role="status" id="mmsg-${m.id}"></p>
+      <p class="note small">In palio: <span class="num">${n(pool)}</span> gettoni · ${bettors} ${bettors === 1 ? "podio giocato" : "podi giocati"}</p>
+    </div>`;
+  }
+  const podAmt = {};
 
   function marketHtml(m, totals, myBets, canBet) {
+    if (m.kind === "podio") return podiumHtml(m, totals, myBets, canBet);
     const opts = (m.options || []).slice().sort((a, b) => a.sort - b.sort || a.id - b.id);
     const pool = opts.reduce((s, o) => s + Number((totals[o.id] || {}).total || 0), 0);
     const st = marketStatus(m);
@@ -419,6 +468,7 @@
   function postHtml(p, totals, myBets, canBet) {
     return `<article class="post">
       <div class="top">${p.game ? `<span class="chip">${esc(p.game)}</span>` : "<span></span>"}<span class="date">${when(p.created_at)}</span></div>
+      ${p.image_url ? `<img class="post-thumb" src="${esc(p.image_url)}" alt="Miniatura del video" loading="lazy">` : ""}
       <h3>${esc(p.title)}</h3>
       ${p.body ? `<p>${esc(p.body)}</p>` : ""}
       ${p.video_url ? `<a class="yt" href="${esc(p.video_url)}" target="_blank" rel="noopener">Guarda il video ↗</a>` : ""}
@@ -464,6 +514,33 @@
 
   // Scelta dell'opzione, importo e puntata
   document.addEventListener("click", async (e) => {
+    const pp = e.target.closest("[data-podpick]");
+    if (pp) {
+      const mid = pp.dataset.market, id = Number(pp.dataset.podpick);
+      const list = podPicks[mid] || (podPicks[mid] = []);
+      const at = list.indexOf(id);
+      if (at >= 0) list.splice(at, 1); else if (list.length < 3) list.push(id);
+      const amt = document.getElementById("amt-" + mid);
+      if (amt) podAmt[mid] = amt.value;
+      const el = document.querySelector(`[data-market-id="${mid}"]`);
+      if (el && lastArgs[mid]) el.outerHTML = podiumHtml(...lastArgs[mid]);
+      return;
+    }
+    const pb = e.target.closest("[data-podbet]");
+    if (pb && sb) {
+      const mid = pb.dataset.podbet;
+      const amt = Number(document.getElementById("amt-" + mid).value);
+      const msg = document.getElementById("mmsg-" + mid);
+      pb.disabled = true;
+      const { error } = await sb.rpc("place_podium_bet", { p_market: Number(mid), p_picks: podPicks[mid], p_amount: amt });
+      pb.disabled = false;
+      if (error) { msg.textContent = errText(error); return; }
+      delete podPicks[mid];
+      await loadProfile();
+      await renderPronostici();
+      document.dispatchEvent(new CustomEvent("club:toast", { detail: `Podio giocato: ${n(amt)} gettoni` }));
+      return;
+    }
     const pick = e.target.closest("[data-pick]");
     if (pick) {
       const mid = pick.dataset.market;
