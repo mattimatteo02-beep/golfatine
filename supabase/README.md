@@ -3,7 +3,7 @@
 Il sito resta statico (GitHub Pages). Login, gettoni, post e puntate stanno su Supabase, che ha un piano gratuito.
 
 1. Crea un account su https://supabase.com e un nuovo progetto (regione Europa, es. Frankfurt).
-2. Apri **SQL Editor**, incolla tutto `supabase/schema.sql` e premi **Run**. Poi fai lo stesso con `supabase/002_nomi_e_avatar.sql` (nome utente e avatar alla registrazione).
+2. Apri **SQL Editor**, incolla tutto `supabase/schema.sql` e premi **Run**. Poi fai lo stesso, in ordine, con `supabase/002_nomi_e_avatar.sql` (nome utente e avatar alla registrazione) e `supabase/003_tifosi.sql` (quanti fan tifano ogni giocatore).
 3. In **Authentication → URL Configuration** metti come *Site URL* l'indirizzo del sito
    (es. `https://mattimatteo02-beep.github.io/golfatine/`) e aggiungilo anche tra i *Redirect URLs*.
 4. In **Project Settings → API** copia *Project URL* e la chiave *anon public* dentro `docs/config.js`.
@@ -13,8 +13,10 @@ Il sito resta statico (GitHub Pages). Login, gettoni, post e puntate stanno su S
 
 ## Conferma dell'email
 
-Di base Supabase chiede ai nuovi iscritti di confermare l'email con un link. Si può togliere in
-**Authentication → Sign In / Providers → Email → Confirm email** (più comodo, ma chiunque può registrarsi con email non sue).
+Di base Supabase chiede ai nuovi iscritti di confermare l'email con un link. **Senza un servizio SMTP collegato,
+però, Supabase manda le email solo agli indirizzi del team del progetto**: i fan non ricevono il link e non riescono
+a entrare. Finché non colleghi un SMTP, togli la conferma in
+**Authentication → Sign In / Providers → Email → Confirm email** (spento): chi si registra entra subito.
 
 ## Come funziona
 

@@ -13,31 +13,42 @@
   const state = { session: null, profile: null };
 
   async function loadProfile() {
-    state.profile = null;
+    state.profile = null; state.profileError = null;
     if (!sb || !state.session) return null;
-    const { data } = await sb.from("profiles").select("*").eq("id", state.session.user.id).maybeSingle();
+    const { data, error } = await sb.from("profiles").select("*").eq("id", state.session.user.id).maybeSingle();
     state.profile = data;
+    state.profileError = error || (data ? null : { message: "Profilo non trovato." });
     return data;
   }
+
+  // Se si arriva dal link dell'email, l'indirizzo contiene il risultato dell'accesso
+  const startHash = location.hash;
+  const fromEmailLink = /access_token=|type=(signup|magiclink|recovery)/.test(startHash);
+  const linkError = /error_description=/.test(startHash)
+    ? decodeURIComponent((startHash.match(/error_description=([^&]*)/) || [])[1] || "").replace(/\+/g, " ") : "";
 
   async function init(onChange) {
     if (!sb) { onChange(); return; }
     const { data } = await sb.auth.getSession();
     state.session = data.session;
     await loadProfile();
+    if (state.session && fromEmailLink && document.getElementById("profilo")) location.hash = "profilo";
+    else if (linkError && document.getElementById("profilo")) { flash = /expired|invalid/i.test(linkError) ? "Il link dell'email è scaduto o già usato: accedi con email e password, oppure fatti mandare un nuovo link." : linkError; location.hash = "profilo"; }
     onChange();
-    sb.auth.onAuthStateChange(async (_e, session) => {
+    // Niente await qui dentro: Supabase lo esegue mentre tiene un blocco interno e si incastrerebbe
+    sb.auth.onAuthStateChange((_e, session) => {
       const changed = (session && session.user.id) !== (state.session && state.session.user.id);
       state.session = session;
-      if (changed) { await loadProfile(); onChange(); }
+      if (changed) setTimeout(async () => { await loadProfile(); onChange(); }, 0);
     });
   }
+  let flash = "";
 
   // Avatar: palline da golf colorate
   const AVATARS = [
-    ["rossa", "#d7263d", "Rossa", "Rohn"], ["rosa", "#f06aa8", "Rosa", "Dread"], ["verde", "#2fa152", "Verde", "Delux"],
-    ["arancione", "#f28c18", "Arancione", "Gabbo"], ["viola", "#8250c8", "Viola", "Mollu"],
-    ["blu-scuro", "#1f3f94", "Blu scuro", "JTaz"], ["blu-chiaro", "#4fb3f0", "Blu chiaro", "Masseo"],
+    ["rossa", "#d7263d", "Rossa", "Rohn", "rohn"], ["rosa", "#f06aa8", "Rosa", "Dread", "dread"], ["verde", "#2fa152", "Verde", "Delux", "delux"],
+    ["arancione", "#f28c18", "Arancione", "Gabbo", "gabbo"], ["viola", "#8250c8", "Viola", "Mollu", "mollu"],
+    ["blu-scuro", "#1f3f94", "Blu scuro", "JTaz", "jtaz"], ["blu-chiaro", "#4fb3f0", "Blu chiaro", "Masseo", "masseo"],
   ];
   const DIMPLES = [[11, 9], [17, 8], [22, 11], [8, 15], [14, 14], [20, 16], [25, 17], [10, 21], [16, 20], [22, 22], [13, 26], [19, 26]];
   function ball(av, size = 32) {
@@ -65,7 +76,6 @@
   const NAME_RE = /^[A-Za-z0-9_.]{3,20}$/;
 
   let authMode = "registrati";
-  let pickingAvatar = false;
 
   // Pannello account: registrazione, accesso, scelta nome e avatar, saldo e bonus
   function accountPanel(el, onChange) {
@@ -97,6 +107,7 @@
           <button class="linkish" type="button" id="li-magic">Password dimenticata? Entra con un link via email</button>
           <p class="msg" id="li-msg" role="status"></p>
         </form>`;
+      if (flash) { const fm = el.querySelector("#su-msg, #li-msg"); if (fm) fm.textContent = flash; flash = ""; }
       el.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => { authMode = b.dataset.mode; accountPanel(el, onChange); }));
 
       const su = el.querySelector("#signup-form");
@@ -106,7 +117,8 @@
           const v = nameIn.value.trim();
           if (!v) { nameMsg.textContent = ""; return true; }
           if (!NAME_RE.test(v)) { nameMsg.textContent = "Da 3 a 20 caratteri: lettere, numeri, punto e trattino basso."; return false; }
-          const { data } = await sb.rpc("username_available", { p_name: v });
+          const { data, error } = await sb.rpc("username_available", { p_name: v });
+          if (error) { nameMsg.textContent = ""; return true; } // il controllo lo rifà comunque il database
           nameMsg.textContent = data ? "Nome libero ✓" : "Nome già preso, scegline un altro.";
           return Boolean(data);
         };
@@ -136,7 +148,19 @@
           if (!pass) { msg.textContent = "Scrivi la password, oppure usa il link via email qui sotto."; return; }
           msg.textContent = "Accesso…";
           const { data, error } = await sb.auth.signInWithPassword({ email: li.querySelector("#li-email").value.trim(), password: pass });
-          if (error) { msg.textContent = authError(error); return; }
+          if (error) {
+            msg.textContent = authError(error);
+            if (/email not confirmed/i.test(error.message)) {
+              const again = document.createElement("button");
+              again.type = "button"; again.className = "linkish"; again.textContent = "Rimandami l'email di conferma";
+              again.addEventListener("click", async () => {
+                const { error: e2 } = await sb.auth.resend({ type: "signup", email: li.querySelector("#li-email").value.trim(), options: { emailRedirectTo: redirect } });
+                msg.textContent = e2 ? authError(e2) : "Email rimandata: controlla la posta (anche lo spam).";
+              });
+              msg.append(" ", again);
+            }
+            return;
+          }
           state.session = data.session; await loadProfile(); onChange();
         });
         li.querySelector("#li-magic").addEventListener("click", async () => {
@@ -149,7 +173,17 @@
       }
       return;
     }
-    if (!p) { el.innerHTML = `<div class="acct"><p class="note">Caricamento del profilo…</p></div>`; return; }
+    if (!p) {
+      el.innerHTML = state.profileError
+        ? `<div class="acct"><p class="acct-title">Non riesco a caricare il tuo profilo</p><p class="note">${esc(errText(state.profileError))}</p>
+           <div class="acct-actions start"><button class="btn" type="button" id="retry">Riprova</button><button class="btn ghost" type="button" id="logout">Esci</button></div></div>`
+        : `<div class="acct"><p class="note">Caricamento del profilo…</p></div>`;
+      const r = el.querySelector("#retry");
+      if (r) r.addEventListener("click", async () => { await loadProfile(); onChange(); });
+      const lo = el.querySelector("#logout");
+      if (lo) lo.addEventListener("click", logout(onChange));
+      return;
+    }
     if (!p.username) {
       el.innerHTML = `<form class="acct" id="name-form">
         <p class="acct-title">Completa il tuo profilo</p>
@@ -163,18 +197,20 @@
         e.preventDefault();
         const avatar = (el.querySelector('input[name="pf-avatar"]:checked') || {}).value || "rossa";
         const { error } = await sb.from("profiles").update({ username: el.querySelector("#name-input").value.trim(), avatar }).eq("id", p.id);
-        if (error) { el.querySelector("#name-msg").textContent = error.code === "23505" ? "Nome già preso, scegline un altro." : errText(error); return; }
+        if (error) { el.querySelector("#name-msg").textContent = nameError(error); return; }
         await loadProfile(); onChange();
       });
       return;
     }
     const claimed = p.last_daily === todayRome();
     const canRescue = p.balance < 50;
+    const fan = AVATARS.find((x) => x[0] === p.avatar) || AVATARS[0];
     el.innerHTML = `<div class="acct acct-in">
       <div class="me">
-        <button type="button" class="me-ball" id="change-avatar" title="Cambia pallina">${ball(p.avatar, 56)}</button>
+        ${ball(p.avatar, 64)}
         <div>
-          <p class="bal-label">Il tuo saldo, ${esc(p.username)}</p>
+          <p class="acct-title">${esc(p.username)}</p>
+          <p class="note small">Tifi ${esc(fan[3])}${p.is_admin ? " · admin" : ""}</p>
           <p class="bal"><span class="num">${n(p.balance)}</span> gettoni</p>
           ${p.daily_streak > 1 ? `<p class="note small">Serie di ${p.daily_streak} giorni di fila</p>` : ""}
         </div>
@@ -185,20 +221,14 @@
         ${p.is_admin ? '<a class="btn ghost" href="admin.html">Pannello admin</a>' : ""}
         <button class="btn ghost" type="button" id="logout">Esci</button>
       </div>
-      ${pickingAvatar ? `<div class="avatar-edit">${avatarPicker("ed-avatar", p.avatar)}</div>` : ""}
       <p class="msg" id="acct-msg" role="status"></p>
     </div>`;
-    el.querySelector("#change-avatar").addEventListener("click", () => { pickingAvatar = !pickingAvatar; accountPanel(el, onChange); });
-    el.querySelectorAll('input[name="ed-avatar"]').forEach((r) => r.addEventListener("change", async () => {
-      const { error } = await sb.from("profiles").update({ avatar: r.value }).eq("id", p.id);
-      if (error) { el.querySelector("#acct-msg").textContent = errText(error); return; }
-      pickingAvatar = false; await loadProfile(); onChange();
-    }));
     const msg = el.querySelector("#acct-msg");
     const daily = el.querySelector("#daily");
     if (daily) daily.addEventListener("click", async () => {
+      daily.disabled = true;
       const { data, error } = await sb.rpc("claim_daily");
-      if (error) { msg.textContent = errText(error); return; }
+      if (error) { daily.disabled = false; msg.textContent = errText(error); return; }
       await loadProfile(); onChange();
       document.dispatchEvent(new CustomEvent("club:toast", { detail: `+${n(data.bonus)} gettoni` }));
     });
@@ -208,7 +238,109 @@
       if (error) { msg.textContent = errText(error); return; }
       await loadProfile(); onChange();
     });
-    el.querySelector("#logout").addEventListener("click", async () => { await sb.auth.signOut(); state.session = null; state.profile = null; onChange(); });
+    el.querySelector("#logout").addEventListener("click", logout(onChange));
+  }
+
+  const logout = (onChange) => async () => {
+    await sb.auth.signOut();
+    state.session = null; state.profile = null;
+    if (document.getElementById("profilo")) location.hash = "profilo";
+    onChange();
+  };
+  const nameError = (error) => error.code === "23505" ? "Nome già preso, scegline un altro."
+    : error.code === "23514" ? "Da 3 a 20 caratteri: lettere, numeri, punto e trattino basso." : errText(error);
+
+  // Gestione del profilo: nome, pallina, password, storico
+  const REASONS = { benvenuto: "Benvenuto", giornaliero: "Bonus del giorno", salvagente: "Salvagente", puntata: "Puntata", vincita: "Vincita", rimborso: "Rimborso" };
+  const shortDate = (iso) => new Date(iso).toLocaleDateString("it-IT", { day: "numeric", month: "short" });
+  async function profileManager(el, onChange) {
+    const p = state.profile;
+    if (!sb || !p || !p.username) { el.innerHTML = ""; return; }
+    el.innerHTML = `<div class="manage">
+      <form class="acct" id="edit-form">
+        <p class="acct-title">Modifica profilo</p>
+        <label class="field"><span>Nome utente</span><input id="ed-name" required pattern="[A-Za-z0-9_.]{3,20}" maxlength="20" autocomplete="username" value="${esc(p.username)}"></label>
+        ${avatarPicker("ed-avatar", p.avatar)}
+        <button class="btn" type="submit">Salva modifiche</button>
+        <p class="msg" id="ed-msg" role="status"></p>
+      </form>
+      <form class="acct" id="pw-form">
+        <p class="acct-title">Accesso</p>
+        <p class="note small">Email: ${esc(state.session.user.email || "")}</p>
+        <input type="email" hidden autocomplete="username" value="${esc(state.session.user.email || "")}">
+        <label class="field"><span>Nuova password (almeno 6 caratteri)</span><input id="pw-new" type="password" required minlength="6" autocomplete="new-password"></label>
+        <button class="btn" type="submit">Cambia password</button>
+        <p class="msg" id="pw-msg" role="status"></p>
+      </form>
+      <div class="acct"><p class="acct-title">I miei pronostici</p><div id="my-bets"><p class="note small">Caricamento…</p></div></div>
+      <div class="acct"><p class="acct-title">Movimenti dei gettoni</p><div id="my-tx"><p class="note small">Caricamento…</p></div></div>
+    </div>`;
+    el.querySelector("#edit-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const m = el.querySelector("#ed-msg");
+      const username = el.querySelector("#ed-name").value.trim();
+      const avatar = (el.querySelector('input[name="ed-avatar"]:checked') || {}).value || p.avatar;
+      if (username === p.username && avatar === p.avatar) { m.textContent = "Nessuna modifica da salvare."; return; }
+      m.textContent = "Salvataggio…";
+      const { error } = await sb.from("profiles").update({ username, avatar }).eq("id", p.id);
+      if (error) { m.textContent = nameError(error); return; }
+      await loadProfile(); onChange();
+      document.dispatchEvent(new CustomEvent("club:toast", { detail: "Profilo aggiornato" }));
+    });
+    el.querySelector("#pw-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const m = el.querySelector("#pw-msg");
+      m.textContent = "Salvataggio…";
+      const { error } = await sb.auth.updateUser({ password: el.querySelector("#pw-new").value });
+      if (error) { m.textContent = /different from the old/i.test(error.message) ? "È uguale a quella di prima: scegline una nuova." : authError(error); return; }
+      el.querySelector("#pw-new").value = "";
+      m.textContent = "Password cambiata.";
+    });
+    const [{ data: bets, error: e1 }, { data: tx, error: e2 }] = await Promise.all([
+      sb.from("bets").select("amount, payout, created_at, options(label), markets(question, status, winning_option), option_id").eq("user_id", p.id).order("created_at", { ascending: false }).limit(30),
+      sb.from("transactions").select("amount, reason, created_at").eq("user_id", p.id).order("created_at", { ascending: false }).limit(20),
+    ]);
+    const betsEl = el.querySelector("#my-bets"), txEl = el.querySelector("#my-tx");
+    if (!betsEl) return;
+    betsEl.innerHTML = e1 ? `<p class="note small">${esc(errText(e1))}</p>` : !bets.length
+      ? `<p class="note small">Nessun pronostico ancora. <a href="#pronostici">Vai ai pronostici</a>.</p>`
+      : `<ul class="hist">${bets.map((b) => {
+          const mk = b.markets || {};
+          const st = mk.status === "pagato" ? (b.payout > 0 ? `<span class="pos-amt">+${n(b.payout)}</span>` : `<span class="neg-amt">perso</span>`)
+            : mk.status === "annullato" ? "rimborsato" : "in attesa";
+          return `<li><span><strong>${esc((b.options || {}).label || "")}</strong> · ${esc(mk.question || "")}<br><span class="note small">${shortDate(b.created_at)} · puntati ${n(b.amount)}</span></span><span class="hist-amt">${st}</span></li>`;
+        }).join("")}</ul>`;
+    txEl.innerHTML = e2 ? `<p class="note small">${esc(errText(e2))}</p>`
+      : `<ul class="hist">${(tx || []).map((t) => `<li><span>${REASONS[t.reason] || esc(t.reason)}<br><span class="note small">${shortDate(t.created_at)}</span></span><span class="hist-amt ${t.amount > 0 ? "pos-amt" : "neg-amt"}">${t.amount > 0 ? "+" : ""}${n(t.amount)}</span></li>`).join("")}</ul>`;
+  }
+
+  // Striscia in cima ai pronostici: chi sei e quanti gettoni hai, oppure invito ad accedere
+  function statusStrip(el) {
+    if (!el) return;
+    const p = state.profile;
+    const steps = document.getElementById("club-steps");
+    if (steps) steps.hidden = Boolean(p && p.username);
+    if (!sb) { el.innerHTML = ""; return; }
+    el.innerHTML = p && p.username
+      ? `<a class="strip" href="#profilo">${ball(p.avatar, 36)}<span><strong>${esc(p.username)}</strong> · <span class="num">${n(p.balance)}</span> gettoni</span>${p.last_daily === todayRome() ? "" : '<span class="strip-tag">Bonus di oggi da ritirare</span>'}<span class="strip-go">Il mio profilo ›</span></a>`
+      : state.session
+        ? `<a class="strip" href="#profilo"><span>Completa il profilo per iniziare a puntare</span><span class="strip-go">Vai ›</span></a>`
+        : `<div class="strip"><span>Per puntare ti serve un account (gratis, 1.000 gettoni in regalo).</span><a class="btn cta small" href="#profilo">Accedi o registrati</a></div>`;
+  }
+
+  // Quanti fan tifano ogni giocatore (in base alla pallina scelta)
+  async function loadFanCounts() {
+    const slots = document.querySelectorAll("[data-fans]");
+    if (!sb || !slots.length) return;
+    const { data, error } = await sb.rpc("fan_counts");
+    if (error || !data) return;
+    const by = {};
+    data.forEach((r) => { const a = AVATARS.find((x) => x[0] === r.avatar); if (a) by[a[4]] = r.fans; });
+    slots.forEach((s) => {
+      const c = by[s.dataset.fans] || 0;
+      s.innerHTML = `<strong class="num">${n(c)}</strong> ${c === 1 ? "fan lo tifa" : "fan lo tifano"}`;
+      s.hidden = false;
+    });
   }
 
   // Post con domande, opzioni e montepremi
@@ -277,7 +409,7 @@
         </div>
         <button type="button" class="btn cta wide" data-bet="${picked[m.id] || ""}" data-market="${m.id}" id="betbtn-${m.id}">Punta su ${esc(selLabel || "")}</button>
       </div>` : ""}
-      ${!canBet && st.open ? `<p class="note small"><a href="#pronostici" class="link-login">Accedi</a> per puntare.</p>` : ""}
+      ${!canBet && st.open ? `<p class="note small"><a href="#profilo" class="link-login">Accedi</a> per puntare.</p>` : ""}
       ${result}
       <p class="msg" role="status" id="mmsg-${m.id}"></p>
       <p class="note small">In palio: <span class="num">${n(pool)}</span> gettoni</p>
@@ -301,7 +433,10 @@
     if (!acct) return;
     const rerender = () => renderPronostici();
     accountPanel(acct, rerender);
+    profileManager(document.getElementById("club-manage"), rerender);
+    statusStrip(document.getElementById("club-status"));
     renderChip();
+    loadFanCounts();
     if (!sb) { list.innerHTML = ""; lb.innerHTML = ""; return; }
     try {
       const { posts, totals, myBets } = await loadPosts();
@@ -322,8 +457,9 @@
     const chip = document.getElementById("club-chip");
     if (!chip) return;
     const p = state.profile;
-    if (p && p.username) chip.innerHTML = `${ball(p.avatar, 20)}<span>${n(p.balance)} gettoni</span>`;
-    else chip.textContent = !sb ? "Area fan" : state.session ? "Completa il profilo" : "Accedi";
+    chip.classList.toggle("is-in", Boolean(p && p.username));
+    if (p && p.username) { chip.innerHTML = `${ball(p.avatar, 22)}<span class="chip-name">${esc(p.username)}</span><span class="chip-bal num">${n(p.balance)}</span>`; chip.title = "Il mio profilo"; }
+    else { chip.textContent = !sb ? "Area fan" : state.session ? "Completa il profilo" : "Accedi"; chip.title = ""; }
   }
 
   // Scelta dell'opzione, importo e puntata
@@ -365,7 +501,7 @@
     clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 2600);
   });
 
-  window.Club = { ball, sb, configured, state, init, loadProfile, accountPanel, loadPosts, marketStatus, esc, n, when, errText };
+  window.Club = { ball, AVATARS, sb, configured, state, init, loadProfile, accountPanel, loadPosts, marketStatus, esc, n, when, errText };
 
   if (document.getElementById("club-posts")) init(renderPronostici);
 })();

@@ -207,6 +207,7 @@
           <div><dt>Podi</dt><dd>${x.podi}</dd></div>
         </dl>
         ${x.titles.length ? `<div class="titles">${x.titles.map((t) => `<span class="trophy ${t.live ? "leader" : ""}">${t.live ? "In testa" : "Campione"} ${esc(t.g.short)} ${t.s}</span>`).join("")}</div>` : ""}
+        <p class="fans-count" data-fans="${x.p}" hidden></p>
         <div class="pbest">Golf: media ${par(x.avgPar, 1)} vs par · ${x.hio} hole in one${x.best ? ` · miglior giro ${par(x.best.r.toPar)} su ${esc(x.best.m.map)}` : ""}</div>
       </button>`;
     }).join("");

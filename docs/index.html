@@ -26,7 +26,7 @@
       <a href="#giocatori">Giocatori</a>
       <a href="#record">Record</a>
     </nav>
-    <a class="club-chip" id="club-chip" href="#pronostici">Accedi</a>
+    <a class="club-chip" id="club-chip" href="#profilo">Accedi</a>
   </div>
 </header>
 
@@ -61,10 +61,10 @@
 
   <section id="pronostici" class="wrap section" data-view="pronostici">
     <h2 class="h2">Pronostici</h2>
-    <ol class="steps"><li><span><strong>Registrati</strong> con nome utente, email e password: ricevi 1.000 gettoni gratis.</span></li><li><span><strong>Scegli</strong> chi vince la prossima golfatina e quanti gettoni puntare.</span></li><li><span><strong>Vinci</strong>: chi indovina si divide i gettoni di tutti.</span></li></ol>
+    <ol class="steps" id="club-steps"><li><span><strong>Registrati</strong> con nome utente, email e password: ricevi 1.000 gettoni gratis.</span></li><li><span><strong>Scegli</strong> chi vince la prossima golfatina e quanti gettoni puntare.</span></li><li><span><strong>Vinci</strong>: chi indovina si divide i gettoni di tutti.</span></li></ol>
     <div class="club">
       <div class="club-main">
-        <div id="club-account"></div>
+        <div id="club-status"></div>
         <div class="posts" id="club-posts"></div>
       </div>
       <aside class="club-side">
@@ -78,6 +78,14 @@
           <li>I gettoni sono gratis e non valgono soldi.</li>
         </ul></details>
       </aside>
+    </div>
+  </section>
+
+  <section id="profilo" class="wrap section" data-view="profilo">
+    <h2 class="h2">Il mio profilo</h2>
+    <div class="profile-grid">
+      <div id="club-account"></div>
+      <div id="club-manage"></div>
     </div>
   </section>
 
