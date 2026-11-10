@@ -124,29 +124,45 @@ window.GOLFATINE = {
    "title": "GOLFATINA ARCADE | UN FLIPPER DI B3STEMMIE con DREAD, GABBO, DELUX e MOLLU ⛳",
    "url": "https://www.youtube.com/watch?v=QsWnUQ9bbss",
    "map": "Arcade Palace",
+   "par": 70,
    "results": [
     {
      "p": "delux",
-     "pos": 1
-    },
-    {
-     "p": "rohn",
-     "pos": null
-    },
-    {
-     "p": "gabbo",
-     "pos": null
-    },
-    {
-     "p": "dread",
-     "pos": null
+     "pos": 1,
+     "strokes": 59,
+     "hio": 3,
+     "toPar": -11
     },
     {
      "p": "mollu",
-     "pos": null
+     "pos": 2,
+     "strokes": 62,
+     "hio": 3,
+     "toPar": -8
+    },
+    {
+     "p": "rohn",
+     "pos": 3,
+     "strokes": 68,
+     "hio": 1,
+     "toPar": -2
+    },
+    {
+     "p": "dread",
+     "pos": 4,
+     "strokes": 74,
+     "hio": 6,
+     "toPar": 4
+    },
+    {
+     "p": "gabbo",
+     "pos": 5,
+     "strokes": 83,
+     "hio": 1,
+     "toPar": 13
     }
    ],
-   "note": "riga aggiunta il 10/11: vincitore dall'annuncio finale nel video (\"vince De Luca\"); classifica completa del tabellone da inserire"
+   "note": "riga aggiunta il 10/11 dallo screenshot del tabellone inviato da Matteo"
   },
   {
    "id": "PYTqakTqHqA",
