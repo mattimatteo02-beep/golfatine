@@ -19,6 +19,7 @@
       <span>Golfatine</span>
     </a>
     <nav class="nav" aria-label="Sezioni">
+      <a href="#pronostici">Pronostici</a>
       <a href="#classifiche">Classifiche</a>
       <a href="#albo">Albo d'oro</a>
       <a href="#giocatori">Giocatori</a>
@@ -27,6 +28,7 @@
       <a href="#record">Record</a>
       <a href="#regole">Regole</a>
     </nav>
+    <a class="club-chip" id="club-chip" href="#pronostici">Area fan</a>
   </div>
 </header>
 
@@ -50,6 +52,28 @@
   <section id="ultima" class="wrap section">
     <h2 class="h2">Ultima golfatina</h2>
     <div id="last"></div>
+  </section>
+
+  <section id="pronostici" class="wrap section">
+    <h2 class="h2">Pronostici</h2>
+    <p class="note">Gli admin pubblicano le prossime golfatine e tu pronostichi con i gettoni. Chi indovina si divide tutto il piatto: meno gente ci crede, più si vince. I gettoni sono gratis e non valgono soldi.</p>
+    <div class="club">
+      <div class="club-main">
+        <div id="club-account"></div>
+        <div class="posts" id="club-posts"></div>
+      </div>
+      <aside class="club-side">
+        <h3 class="h3">Classifica fan</h3>
+        <div id="club-leaderboard"></div>
+        <h3 class="h3">Come si guadagnano gettoni</h3>
+        <ul class="earn">
+          <li><strong>1.000</strong> alla registrazione</li>
+          <li><strong>100</strong> al giorno con il bonus, <strong>+20</strong> per ogni giorno di fila (fino a 200)</li>
+          <li><strong>200</strong> di salvagente se scendi sotto 50, una volta a settimana</li>
+          <li>Indovinando i pronostici</li>
+        </ul>
+      </aside>
+    </div>
   </section>
 
   <section id="classifiche" class="wrap section">
@@ -138,7 +162,11 @@
   <div class="wrap" id="footer"></div>
 </footer>
 
+<div class="toast" id="toast" role="status" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script src="club.js"></script>
 </body>
 </html>

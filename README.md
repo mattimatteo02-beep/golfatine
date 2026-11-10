@@ -6,7 +6,9 @@ Sito delle classifiche delle golfatine del gruppo MELAGODO: ogni video è una pa
 
 - `data/golfatine.xlsx`: il modello di raccolta dati compilato (fonte unica dei risultati).
 - `scripts/build_data.py`: legge il modello e genera `docs/data.js`.
-- `docs/`: il sito statico (HTML, CSS, JS senza dipendenze).
+- `docs/`: il sito statico (HTML, CSS, JS senza build).
+- `docs/admin.html`: pannello admin per pubblicare i post e pagare i pronostici.
+- `supabase/`: database per login dei fan, gettoni e pronostici (istruzioni in `supabase/README.md`).
 
 ## Aggiornare i dati
 
