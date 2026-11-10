@@ -82,12 +82,15 @@
     const claimed = p.last_daily === todayRome();
     const canRescue = p.balance < 50;
     el.innerHTML = `<div class="acct acct-in">
-      <div><p class="acct-title">Ciao ${esc(p.username)}${p.is_admin ? ' <a class="chip" href="admin.html">admin</a>' : ""}</p>
+      <div>
+        <p class="bal-label">Il tuo saldo, ${esc(p.username)}</p>
         <p class="bal"><span class="num">${n(p.balance)}</span> gettoni</p>
-        <p class="note">${p.daily_streak > 1 ? `Serie di ${p.daily_streak} giorni di fila. ` : ""}I gettoni non valgono soldi: servono solo per giocare.</p></div>
+        ${p.daily_streak > 1 ? `<p class="note small">Serie di ${p.daily_streak} giorni di fila</p>` : ""}
+      </div>
       <div class="acct-actions">
-        <button class="btn" type="button" id="daily" ${claimed ? "disabled" : ""}>${claimed ? "Bonus di oggi riscattato" : "Riscatta il bonus di oggi"}</button>
-        ${canRescue ? '<button class="btn ghost" type="button" id="rescue">Salvagente (+200)</button>' : ""}
+        ${claimed ? "" : '<button class="btn cta" type="button" id="daily">Prendi il bonus di oggi</button>'}
+        ${canRescue ? '<button class="btn" type="button" id="rescue">Salvagente +200</button>' : ""}
+        ${p.is_admin ? '<a class="btn ghost" href="admin.html">Pannello admin</a>' : ""}
         <button class="btn ghost" type="button" id="logout">Esci</button>
       </div>
       <p class="msg" id="acct-msg" role="status"></p>
@@ -136,10 +139,13 @@
     return { label: `Puntate aperte fino a ${when(m.closes_at)}`, open: true };
   }
 
+  const picked = {}; // domanda -> opzione scelta
+
   function marketHtml(m, totals, myBets, canBet) {
     const opts = (m.options || []).slice().sort((a, b) => a.sort - b.sort || a.id - b.id);
     const pool = opts.reduce((s, o) => s + Number((totals[o.id] || {}).total || 0), 0);
     const st = marketStatus(m);
+    const open = st.open && canBet;
     const mine = myBets.filter((b) => b.market_id === m.id);
     const rows = opts.map((o) => {
       const t = Number((totals[o.id] || {}).total || 0);
@@ -147,24 +153,35 @@
       const quota = t ? pool / t : null;
       const win = m.winning_option === o.id && m.status === "pagato";
       const myOn = mine.filter((b) => b.option_id === o.id).reduce((s, b) => s + Number(b.amount), 0);
-      return `<li class="opt ${win ? "won" : ""}">
-        <span class="opt-bar" style="width:${share}%"></span>
-        <span class="opt-label">${esc(o.label)}${win ? " · vince" : ""}${myOn ? ` <span class="mine">tu: ${n(myOn)}</span>` : ""}</span>
-        <span class="opt-num num">${share}%</span>
-        <span class="opt-num num" title="Quanto rende ogni gettone se vince, con il piatto di adesso">${quota ? "x" + quota.toLocaleString("it-IT", { maximumFractionDigits: 2 }) : "–"}</span>
-        ${st.open && canBet ? `<button class="btn small" type="button" data-bet="${o.id}" data-market="${m.id}">Punta</button>` : ""}
-      </li>`;
+      const sel = picked[m.id] === o.id;
+      const inner = `<span class="opt-bar" style="width:${share}%"></span>
+        <span class="opt-label">${esc(o.label)}${win ? " · ha vinto" : ""}${myOn ? ` <span class="mine">hai puntato ${n(myOn)}</span>` : ""}</span>
+        <span class="opt-num num" title="Ogni gettone puntato ne rende tanti così se vince">${quota ? "rende x" + quota.toLocaleString("it-IT", { maximumFractionDigits: 1 }) : ""}</span>`;
+      return open
+        ? `<li><button type="button" class="opt pick ${sel ? "chosen" : ""}" data-pick="${o.id}" data-market="${m.id}" data-label="${esc(o.label)}" aria-pressed="${sel}">${inner}</button></li>`
+        : `<li class="opt ${win ? "won" : ""}">${inner}</li>`;
     }).join("");
     const paid = mine.filter((b) => b.payout != null);
     const result = paid.length
       ? `<p class="note">Hai puntato ${n(mine.reduce((s, b) => s + Number(b.amount), 0))} e ricevuto ${n(paid.reduce((s, b) => s + Number(b.payout), 0))} gettoni.</p>` : "";
+    const selLabel = picked[m.id] ? (opts.find((o) => o.id === picked[m.id]) || {}).label : null;
     return `<div class="market" data-market-id="${m.id}">
-      <div class="market-head"><h4>${esc(m.question)}</h4><span class="market-state ${st.open ? "is-open" : ""}">${st.label}</span></div>
-      <p class="note small">Piatto: <span class="num">${n(pool)}</span> gettoni</p>
+      <div class="market-head"><h4>${esc(m.question)}</h4><span class="market-state ${st.open ? "is-open" : ""}">${st.open ? "Chiude " + when(m.closes_at) : st.label}</span></div>
+      ${open ? `<p class="note small">1. Tocca chi secondo te vince</p>` : ""}
       <ol class="opts">${rows}</ol>
-      ${st.open && canBet ? `<div class="row bet-row"><label for="amt-${m.id}">Puntata</label><input id="amt-${m.id}" class="amt" type="number" min="10" step="10" value="50" inputmode="numeric"><span class="note small">Scegli quanto, poi tocca Punta sull'opzione.</span></div>` : ""}
+      ${open ? `<div class="bet-box" ${selLabel ? "" : "hidden"} id="betbox-${m.id}">
+        <p class="note small">2. Quanti gettoni punti?</p>
+        <div class="row">
+          ${[50, 100, 250].map((v) => `<button type="button" class="btn ghost small" data-amt="${v}" data-market="${m.id}">${v}</button>`).join("")}
+          <label class="sr" for="amt-${m.id}">Gettoni</label>
+          <input id="amt-${m.id}" class="amt" type="number" min="10" step="10" value="100" inputmode="numeric">
+        </div>
+        <button type="button" class="btn cta wide" data-bet="${picked[m.id] || ""}" data-market="${m.id}" id="betbtn-${m.id}">Punta su ${esc(selLabel || "")}</button>
+      </div>` : ""}
+      ${!canBet && st.open ? `<p class="note small"><a href="#pronostici" class="link-login">Accedi</a> per puntare.</p>` : ""}
       ${result}
       <p class="msg" role="status" id="mmsg-${m.id}"></p>
+      <p class="note small">In palio: <span class="num">${n(pool)}</span> gettoni</p>
     </div>`;
   }
 
@@ -206,13 +223,28 @@
     const chip = document.getElementById("club-chip");
     if (!chip) return;
     const p = state.profile;
-    chip.textContent = !sb ? "Area fan" : p && p.username ? `${n(p.balance)} gettoni` : "Accedi";
+    chip.textContent = !sb ? "Area fan" : p && p.username ? `${n(p.balance)} gettoni` : state.session ? "Scegli il nome" : "Accedi";
   }
 
-  // Click su "Punta"
+  // Scelta dell'opzione, importo e puntata
   document.addEventListener("click", async (e) => {
+    const pick = e.target.closest("[data-pick]");
+    if (pick) {
+      const mid = pick.dataset.market;
+      picked[mid] = Number(pick.dataset.pick);
+      document.querySelectorAll(`[data-pick][data-market="${mid}"]`).forEach((x) => {
+        const on = x === pick; x.classList.toggle("chosen", on); x.setAttribute("aria-pressed", on);
+      });
+      const box = document.getElementById("betbox-" + mid);
+      if (box) box.hidden = false;
+      const btn = document.getElementById("betbtn-" + mid);
+      if (btn) { btn.dataset.bet = pick.dataset.pick; btn.textContent = "Punta su " + pick.dataset.label; }
+      return;
+    }
+    const amtBtn = e.target.closest("[data-amt]");
+    if (amtBtn) { document.getElementById("amt-" + amtBtn.dataset.market).value = amtBtn.dataset.amt; return; }
     const b = e.target.closest("[data-bet]");
-    if (!b || !sb) return;
+    if (!b || !sb || !b.dataset.bet) return;
     const mid = b.dataset.market;
     const amt = Number(document.getElementById("amt-" + mid).value);
     const msg = document.getElementById("mmsg-" + mid);
@@ -220,10 +252,10 @@
     const { error } = await sb.rpc("place_bet", { p_option: Number(b.dataset.bet), p_amount: amt });
     b.disabled = false;
     if (error) { msg.textContent = errText(error); return; }
+    delete picked[mid];
     await loadProfile();
     await renderPronostici();
-    const m2 = document.getElementById("mmsg-" + mid);
-    if (m2) m2.textContent = `Puntata di ${n(amt)} gettoni registrata.`;
+    document.dispatchEvent(new CustomEvent("club:toast", { detail: `Puntata di ${n(amt)} gettoni fatta` }));
   });
 
   let toastTimer;

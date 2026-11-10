@@ -14,31 +14,30 @@
 <body>
 <header class="topbar">
   <div class="wrap topbar-in">
-    <a class="brand" href="#top" aria-label="Torna su">
+    <a class="brand" href="#home" aria-label="Home">
       <svg class="flag" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2v20" stroke="currentColor" stroke-width="2" fill="none"/><path d="M7 3l11 4-11 4z" fill="var(--flag)"/></svg>
       <span>Golfatine</span>
     </a>
-    <nav class="nav" aria-label="Sezioni">
+    <nav class="nav" aria-label="Pagine">
+      <a href="#home">Home</a>
       <a href="#pronostici">Pronostici</a>
       <a href="#classifiche">Classifiche</a>
-      <a href="#albo">Albo d'oro</a>
-      <a href="#giocatori">Giocatori</a>
       <a href="#partite">Partite</a>
-      <a href="#sfide">Testa a testa</a>
+      <a href="#giocatori">Giocatori</a>
       <a href="#record">Record</a>
-      <a href="#regole">Regole</a>
     </nav>
-    <a class="club-chip" id="club-chip" href="#pronostici">Area fan</a>
+    <a class="club-chip" id="club-chip" href="#pronostici">Accedi</a>
   </div>
 </header>
 
 <main id="top">
-  <section class="hero">
+  <section class="hero" data-view="home">
     <div class="wrap hero-in">
       <div class="hero-copy">
         <p class="eyebrow">Campionato MELAGODO · <span id="hero-season"></span></p>
         <h1>Golfatine</h1>
-        <p class="lede">Ogni video è una partita, ogni anno è una stagione. Qui ci sono tutte le golfatine lette dai tabelloni finali: chi vince, chi va sotto il par e chi finisce in fondo.</p>
+        <p class="lede">Ogni video è una partita, ogni anno è una stagione. Guarda chi comanda e pronostica la prossima golfatina.</p>
+        <div class="hero-cta"><a class="btn cta" href="#pronostici">Fai il tuo pronostico</a><a class="btn ghost-light" href="#classifiche">Vedi le classifiche</a></div>
         <dl class="kpis" id="kpis"></dl>
       </div>
       <figure class="board" aria-labelledby="board-cap">
@@ -49,14 +48,20 @@
     </div>
   </section>
 
-  <section id="ultima" class="wrap section">
+  <section id="ultima" class="wrap section" data-view="home">
     <h2 class="h2">Ultima golfatina</h2>
     <div id="last"></div>
   </section>
 
-  <section id="pronostici" class="wrap section">
+  <section id="albo" class="wrap section" data-view="home">
+    <h2 class="h2">Albo d'oro</h2>
+    <p class="note">Il campione di ogni stagione. La stagione dell'anno in corso mostra chi è in testa.</p>
+    <div class="albo" id="albo-list"></div>
+  </section>
+
+  <section id="pronostici" class="wrap section" data-view="pronostici">
     <h2 class="h2">Pronostici</h2>
-    <p class="note">Gli admin pubblicano le prossime golfatine e tu pronostichi con i gettoni. Chi indovina si divide tutto il piatto: meno gente ci crede, più si vince. I gettoni sono gratis e non valgono soldi.</p>
+    <ol class="steps"><li><span><strong>Accedi</strong> con la tua email e ricevi 1.000 gettoni gratis.</span></li><li><span><strong>Scegli</strong> chi vince la prossima golfatina e quanti gettoni puntare.</span></li><li><span><strong>Vinci</strong>: chi indovina si divide i gettoni di tutti.</span></li></ol>
     <div class="club">
       <div class="club-main">
         <div id="club-account"></div>
@@ -65,18 +70,18 @@
       <aside class="club-side">
         <h3 class="h3">Classifica fan</h3>
         <div id="club-leaderboard"></div>
-        <h3 class="h3">Come si guadagnano gettoni</h3>
-        <ul class="earn">
+        <details class="earn-box"><summary>Come si guadagnano gettoni</summary><ul class="earn">
           <li><strong>1.000</strong> alla registrazione</li>
           <li><strong>100</strong> al giorno con il bonus, <strong>+20</strong> per ogni giorno di fila (fino a 200)</li>
           <li><strong>200</strong> di salvagente se scendi sotto 50, una volta a settimana</li>
           <li>Indovinando i pronostici</li>
-        </ul>
+          <li>I gettoni sono gratis e non valgono soldi.</li>
+        </ul></details>
       </aside>
     </div>
   </section>
 
-  <section id="classifiche" class="wrap section">
+  <section id="classifiche" class="wrap section" data-view="classifiche">
     <div class="section-head">
       <h2 class="h2">Classifiche</h2>
       <div class="controls">
@@ -88,19 +93,14 @@
     <div class="scroll"><table class="lb" id="lb"></table></div>
   </section>
 
-  <section id="albo" class="wrap section">
-    <h2 class="h2">Albo d'oro</h2>
-    <p class="note">Il campione di ogni stagione. La stagione dell'anno in corso mostra chi è in testa.</p>
-    <div class="albo" id="albo-list"></div>
-  </section>
 
-  <section id="giocatori" class="wrap section">
+  <section id="giocatori" class="wrap section" data-view="giocatori">
     <h2 class="h2">Giocatori</h2>
     <p class="note">Numeri di carriera su tutti i giochi. Tocca un giocatore per vedere le sue partite.</p>
     <div class="players" id="players"></div>
   </section>
 
-  <section id="partite" class="wrap section">
+  <section id="partite" class="wrap section" data-view="partite">
     <div class="section-head">
       <h2 class="h2">Partite</h2>
       <div class="controls">
@@ -114,7 +114,7 @@
     <button class="more" id="more" type="button">Mostra altre partite</button>
   </section>
 
-  <section id="sfide" class="wrap section">
+  <section id="sfide" class="wrap section" data-view="giocatori">
     <h2 class="h2">Testa a testa</h2>
     <p class="note">Nelle partite giocate insieme, chi è arrivato davanti all'altro. Conta golf e Super Battle Golf, dove c'è la classifica completa.</p>
     <div class="h2h-controls">
@@ -125,12 +125,12 @@
     <div id="h2h"></div>
   </section>
 
-  <section id="record" class="wrap section">
+  <section id="record" class="wrap section" data-view="record">
     <h2 class="h2">Record</h2>
     <div class="records" id="records"></div>
   </section>
 
-  <section id="regole" class="wrap section">
+  <section id="regole" class="wrap section" data-view="record">
     <h2 class="h2">Regole e fonti</h2>
     <div class="rules">
       <div>

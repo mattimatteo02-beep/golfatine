@@ -91,7 +91,7 @@
           <div class="market-head"><h4>${esc(m.question)}</h4><span class="market-state ${st.open ? "is-open" : ""}">${st.label}</span></div>
           <ol class="opts">${opts.map((o) => {
             const t = (totals[o.id] || {});
-            return `<li class="opt ${m.winning_option === o.id && m.status === "pagato" ? "won" : ""}"><span class="opt-label">${esc(o.label)}</span><span class="opt-num num">${n(t.total)}</span><span class="opt-num num">${t.bettors || 0} fan</span></li>`;
+            return `<li class="opt admin-opt ${m.winning_option === o.id && m.status === "pagato" ? "won" : ""}"><span class="opt-label">${esc(o.label)}</span><span class="opt-num num">${n(t.total)}</span><span class="opt-num num">${t.bettors || 0} fan</span></li>`;
           }).join("")}</ol>
           <p class="note small">Piatto: ${n(pool)} gettoni · chiusura ${when(m.closes_at)}</p>
           ${done ? "" : `<div class="row">
