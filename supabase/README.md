@@ -3,13 +3,18 @@
 Il sito resta statico (GitHub Pages). Login, gettoni, post e puntate stanno su Supabase, che ha un piano gratuito.
 
 1. Crea un account su https://supabase.com e un nuovo progetto (regione Europa, es. Frankfurt).
-2. Apri **SQL Editor**, incolla tutto `supabase/schema.sql` e premi **Run**.
+2. Apri **SQL Editor**, incolla tutto `supabase/schema.sql` e premi **Run**. Poi fai lo stesso con `supabase/002_nomi_e_avatar.sql` (nome utente e avatar alla registrazione).
 3. In **Authentication → URL Configuration** metti come *Site URL* l'indirizzo del sito
    (es. `https://mattimatteo02-beep.github.io/golfatine/`) e aggiungilo anche tra i *Redirect URLs*.
 4. In **Project Settings → API** copia *Project URL* e la chiave *anon public* dentro `docs/config.js`.
 5. Registrati sul sito con la tua email, scegli il nome utente, poi nel SQL Editor rendi admin il tuo account:
    `update public.profiles set is_admin = true where username = 'TUO_NOME';`
 6. Il pannello admin è su `admin.html` (il link compare accanto al tuo nome quando sei admin).
+
+## Conferma dell'email
+
+Di base Supabase chiede ai nuovi iscritti di confermare l'email con un link. Si può togliere in
+**Authentication → Sign In / Providers → Email → Confirm email** (più comodo, ma chiunque può registrarsi con email non sue).
 
 ## Come funziona
 
