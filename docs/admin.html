@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Golfatine Admin</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="index.html" aria-label="Torna al sito">
+      <svg class="flag" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2v20" stroke="currentColor" stroke-width="2" fill="none"/><path d="M7 3l11 4-11 4z" fill="var(--flag)"/></svg>
+      <span>Golfatine</span>
+    </a>
+    <nav class="nav" aria-label="Sezioni"><a href="#nuovo">Nuovo post</a><a href="#gestione">Gestione</a></nav>
+    <a class="club-chip" href="index.html#pronostici">Torna al sito</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="section">
+    <h1 class="h2">Pannello admin</h1>
+    <p class="note">Qui si pubblicano i post delle prossime golfatine, con le domande su cui i fan puntano. Quando il video esce, chiudi le puntate e indica il risultato: i gettoni vengono pagati in automatico.</p>
+    <div id="club-account"></div>
+    <p class="msg" id="gate"></p>
+  </section>
+
+  <div id="admin" hidden>
+    <section id="nuovo" class="section">
+      <h2 class="h2">Nuovo post</h2>
+      <form class="acct admin-form" id="post-form">
+        <label class="field"><span>Titolo</span><input id="f-title" required minlength="3" maxlength="140" placeholder="Golfatina di domenica: chi la spunta?"></label>
+        <div class="field-row">
+          <label class="field"><span>Gioco</span>
+            <select id="f-game"><option>Golf With Your Friends</option><option>Super Battle Golf</option><option>UNO</option><option>Trackmania</option><option>GTA V Online</option><option>Altro</option></select></label>
+          <label class="field"><span>Link al video (anche dopo)</span><input id="f-video" type="url" placeholder="https://www.youtube.com/watch?v=…"></label>
+        </div>
+        <label class="field"><span>Descrizione</span><textarea id="f-body" maxlength="1000" placeholder="Chi gioca, su che mappa, quando esce…"></textarea></label>
+        <label class="check"><input type="checkbox" id="f-published" checked> Pubblica subito (altrimenti resta in bozza, visibile solo agli admin)</label>
+
+        <h3 class="h3">Domande</h3>
+        <div id="markets"></div>
+        <div class="row">
+          <button class="btn ghost" type="button" id="add-winner">+ Chi vince?</button>
+          <button class="btn ghost" type="button" id="add-last">+ Chi arriva ultimo?</button>
+          <button class="btn ghost" type="button" id="add-custom">+ Domanda libera</button>
+        </div>
+        <div class="row"><button class="btn" type="submit">Pubblica il post</button></div>
+        <p class="msg" id="post-msg" role="status"></p>
+      </form>
+    </section>
+
+    <section id="gestione" class="section">
+      <h2 class="h2">Gestione</h2>
+      <p class="note">Per ogni domanda: chiudi le puntate quando inizia la partita, poi scegli chi ha vinto e paga. Se la partita salta, annulla: tutti vengono rimborsati. Se nessuno ha indovinato, vengono rimborsati tutti.</p>
+      <div class="posts" id="admin-posts"></div>
+    </section>
+  </div>
+</main>
+
+<div class="toast" id="toast" role="status" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script src="club.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

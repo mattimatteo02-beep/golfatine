@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Golfatine Melagodo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Classifiche, stagioni e record delle golfatine del gruppo MELAGODO.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="#top" aria-label="Torna su">
+      <svg class="flag" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2v20" stroke="currentColor" stroke-width="2" fill="none"/><path d="M7 3l11 4-11 4z" fill="var(--flag)"/></svg>
+      <span>Golfatine</span>
+    </a>
+    <nav class="nav" aria-label="Sezioni">
+      <a href="#pronostici">Pronostici</a>
+      <a href="#classifiche">Classifiche</a>
+      <a href="#albo">Albo d'oro</a>
+      <a href="#giocatori">Giocatori</a>
+      <a href="#partite">Partite</a>
+      <a href="#sfide">Testa a testa</a>
+      <a href="#record">Record</a>
+      <a href="#regole">Regole</a>
+    </nav>
+    <a class="club-chip" id="club-chip" href="#pronostici">Area fan</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-in">
+      <div class="hero-copy">
+        <p class="eyebrow">Campionato MELAGODO · <span id="hero-season"></span></p>
+        <h1>Golfatine</h1>
+        <p class="lede">Ogni video è una partita, ogni anno è una stagione. Qui ci sono tutte le golfatine lette dai tabelloni finali: chi vince, chi va sotto il par e chi finisce in fondo.</p>
+        <dl class="kpis" id="kpis"></dl>
+      </div>
+      <figure class="board" aria-labelledby="board-cap">
+        <figcaption id="board-cap" class="board-cap"></figcaption>
+        <table class="board-table" id="board"></table>
+        <p class="board-foot" id="board-foot"></p>
+      </figure>
+    </div>
+  </section>
+
+  <section id="ultima" class="wrap section">
+    <h2 class="h2">Ultima golfatina</h2>
+    <div id="last"></div>
+  </section>
+
+  <section id="pronostici" class="wrap section">
+    <h2 class="h2">Pronostici</h2>
+    <p class="note">Gli admin pubblicano le prossime golfatine e tu pronostichi con i gettoni. Chi indovina si divide tutto il piatto: meno gente ci crede, più si vince. I gettoni sono gratis e non valgono soldi.</p>
+    <div class="club">
+      <div class="club-main">
+        <div id="club-account"></div>
+        <div class="posts" id="club-posts"></div>
+      </div>
+      <aside class="club-side">
+        <h3 class="h3">Classifica fan</h3>
+        <div id="club-leaderboard"></div>
+        <h3 class="h3">Come si guadagnano gettoni</h3>
+        <ul class="earn">
+          <li><strong>1.000</strong> alla registrazione</li>
+          <li><strong>100</strong> al giorno con il bonus, <strong>+20</strong> per ogni giorno di fila (fino a 200)</li>
+          <li><strong>200</strong> di salvagente se scendi sotto 50, una volta a settimana</li>
+          <li>Indovinando i pronostici</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section id="classifiche" class="wrap section">
+    <div class="section-head">
+      <h2 class="h2">Classifiche</h2>
+      <div class="controls">
+        <div class="seg" id="game-seg" role="tablist" aria-label="Gioco"></div>
+        <label class="sel"><span>Stagione</span><select id="season-sel"></select></label>
+      </div>
+    </div>
+    <p class="note" id="table-note"></p>
+    <div class="scroll"><table class="lb" id="lb"></table></div>
+  </section>
+
+  <section id="albo" class="wrap section">
+    <h2 class="h2">Albo d'oro</h2>
+    <p class="note">Il campione di ogni stagione. La stagione dell'anno in corso mostra chi è in testa.</p>
+    <div class="albo" id="albo-list"></div>
+  </section>
+
+  <section id="giocatori" class="wrap section">
+    <h2 class="h2">Giocatori</h2>
+    <p class="note">Numeri di carriera su tutti i giochi. Tocca un giocatore per vedere le sue partite.</p>
+    <div class="players" id="players"></div>
+  </section>
+
+  <section id="partite" class="wrap section">
+    <div class="section-head">
+      <h2 class="h2">Partite</h2>
+      <div class="controls">
+        <label class="sel"><span>Gioco</span><select id="m-game"></select></label>
+        <label class="sel"><span>Stagione</span><select id="m-season"></select></label>
+        <label class="sel"><span>Giocatore</span><select id="m-player"></select></label>
+      </div>
+    </div>
+    <p class="note" id="m-count"></p>
+    <div class="matches" id="matches"></div>
+    <button class="more" id="more" type="button">Mostra altre partite</button>
+  </section>
+
+  <section id="sfide" class="wrap section">
+    <h2 class="h2">Testa a testa</h2>
+    <p class="note">Nelle partite giocate insieme, chi è arrivato davanti all'altro. Conta golf e Super Battle Golf, dove c'è la classifica completa.</p>
+    <div class="h2h-controls">
+      <label class="sel"><span>Giocatore A</span><select id="h-a"></select></label>
+      <span class="vs">vs</span>
+      <label class="sel"><span>Giocatore B</span><select id="h-b"></select></label>
+    </div>
+    <div id="h2h"></div>
+  </section>
+
+  <section id="record" class="wrap section">
+    <h2 class="h2">Record</h2>
+    <div class="records" id="records"></div>
+  </section>
+
+  <section id="regole" class="wrap section">
+    <h2 class="h2">Regole e fonti</h2>
+    <div class="rules">
+      <div>
+        <h3>Come si conta</h3>
+        <ul>
+          <li>Ogni video di gruppo è una partita. La stagione è l'anno di pubblicazione del video.</li>
+          <li>Classifica ordinata per vittorie, poi podi, poi posizione media.</li>
+          <li>Pari merito al primo posto vale una vittoria per tutti.</li>
+          <li><strong>Golf With Your Friends</strong> e <strong>Super Battle Golf</strong>: conta la posizione finale sul tabellone.</li>
+          <li><strong>UNO</strong>: conta solo chi vince il video.</li>
+          <li>Gli ospiti compaiono nei risultati ma non nelle classifiche.</li>
+          <li>Nel golf, sotto il par in <span class="under">rosso</span>, sopra il par in nero, come sui tabelloni veri.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Cosa manca</h3>
+        <ul>
+          <li>GTA non è incluso: troppi video e troppo vecchi.</li>
+          <li>Trackmania arriverà più avanti, compilato a mano.</li>
+          <li id="unreadable-line"></li>
+        </ul>
+        <details class="unreadable"><summary>Video senza risultato leggibile</summary><ul id="unreadable"></ul></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap" id="footer"></div>
+</footer>
+
+<div class="toast" id="toast" role="status" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="club.js"></script>
+</body>
+</html>
