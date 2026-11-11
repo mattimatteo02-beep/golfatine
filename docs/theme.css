@@ -1,0 +1,76 @@
+/* Temi per gioco: i colori seguono il gioco scelto in Classifiche (body[data-game], impostato da app.js). */
+body[data-game="uno"] { --fairway: #b5121b; --fairway-ink: #fff; --flag: #f7d117; --focus: #f7d117; }
+body[data-game="sbg"] { --fairway: #142a6b; --fairway-ink: #fff; --flag: #ff7a1a; --focus: #ff9a4d; }
+body[data-game="gta"] { --fairway: #0e1116; --fairway-ink: #fff; --flag: #2fa8ff; --focus: #2fa8ff; }
+.hero, .topbar, .seg button { transition: background-color .4s ease, color .4s ease; }
+body[data-game="golf"] .hero { background-image: repeating-linear-gradient(90deg, rgb(255 255 255 / .04) 0 60px, transparent 60px 120px); }
+body[data-game="uno"] .hero { background-image: repeating-linear-gradient(135deg, rgb(0 0 0 / .16) 0 40px, transparent 40px 80px); }
+body[data-game="sbg"] .hero { background-image: radial-gradient(rgb(255 255 255 / .09) 2px, transparent 2.5px); background-size: 22px 22px; }
+body[data-game="gta"] .hero { background-image: repeating-linear-gradient(90deg, transparent 0 calc(50% - 3px), rgb(47 168 255 / .3) calc(50% - 3px) calc(50% + 3px), transparent calc(50% + 3px) 100%); }
+
+/* Banda animata sopra la classifica */
+.fx { position: relative; height: 64px; margin: 14px 0 4px; border-radius: 10px; overflow: hidden; background: var(--fairway); color: var(--fairway-ink); }
+.fx > div { display: none; position: absolute; inset: 0; }
+body[data-game="golf"] .fx-golf, body[data-game="uno"] .fx-uno, body[data-game="sbg"] .fx-sbg, body[data-game="gta"] .fx-gta { display: block; }
+.fx i, .fx b { position: absolute; display: block; }
+
+/* golf: erba a strisce, pallina che rotola verso la bandiera */
+.fx-golf { background: repeating-linear-gradient(90deg, rgb(255 255 255 / .07) 0 40px, transparent 40px 80px); animation: fx-mow 6s linear infinite; }
+.fx-golf .ball { width: 14px; height: 14px; border-radius: 50%; background: #fff; bottom: 14px; left: 4%; box-shadow: inset -3px -3px 0 rgb(0 0 0 / .15); animation: fx-roll 4s cubic-bezier(.2, .7, .3, 1) infinite; }
+.fx-golf .flag { right: 8%; bottom: 12px; width: 3px; height: 40px; background: #fff; }
+.fx-golf .flag::after { content: ""; position: absolute; left: 3px; top: 0; width: 26px; height: 16px; background: var(--flag); clip-path: polygon(0 0, 100% 50%, 0 100%); transform-origin: left center; animation: fx-wave 1.2s ease-in-out infinite alternate; }
+@keyframes fx-mow { to { background-position: 160px 0; } }
+@keyframes fx-roll { 0% { left: 4%; transform: rotate(0); } 80%, 100% { left: calc(92% - 18px); transform: rotate(720deg); } }
+@keyframes fx-wave { to { transform: scaleX(.75) skewY(6deg); } }
+
+/* UNO: carte che si aprono a ventaglio, +4 che salta fuori */
+.fx-uno { background: repeating-linear-gradient(135deg, rgb(0 0 0 / .18) 0 18px, transparent 18px 36px); }
+.fx-uno i { left: 50%; top: 10px; width: 30px; height: 44px; margin-left: -15px; border-radius: 5px; border: 2px solid #fff; transform-origin: 50% 120%; animation: fx-fan 3s ease-in-out infinite; }
+.fx-uno i:nth-child(1) { background: #111; --r: -30deg; }
+.fx-uno i:nth-child(2) { background: #f7d117; --r: -10deg; }
+.fx-uno i:nth-child(3) { background: #1f8f3a; --r: 10deg; }
+.fx-uno i:nth-child(4) { background: #1d5fd1; --r: 30deg; }
+.fx-uno b { right: 10%; top: 12px; font: 800 1.8rem/1 var(--font-display); color: var(--flag); text-shadow: 2px 2px 0 #111; animation: fx-pop 3s ease-in-out infinite; }
+@keyframes fx-fan { 0%, 15% { transform: rotate(0); } 45%, 75% { transform: rotate(var(--r)); } 100% { transform: rotate(0); } }
+@keyframes fx-pop { 0%, 40% { transform: scale(0) rotate(-20deg); opacity: 0; } 55% { transform: scale(1.3) rotate(8deg); opacity: 1; } 65%, 85% { transform: scale(1) rotate(0); opacity: 1; } 100% { transform: scale(0); opacity: 0; } }
+
+/* Super Battle Golf: palline che rimbalzano e scoppio da fumetto */
+.fx-sbg { background-image: radial-gradient(rgb(255 255 255 / .1) 2px, transparent 2.5px); background-size: 18px 18px; }
+.fx-sbg i { bottom: 6px; width: 16px; height: 16px; border-radius: 50%; background: #fff; animation: fx-bounce .9s cubic-bezier(.3, 0, .7, 1) infinite alternate; }
+.fx-sbg i:nth-child(1) { left: 12%; }
+.fx-sbg i:nth-child(2) { left: 26%; animation-delay: .3s; background: var(--flag); }
+.fx-sbg i:nth-child(3) { left: 40%; animation-delay: .6s; }
+.fx-sbg b { right: 8%; top: 4px; padding: 18px 22px; background: var(--flag); color: #142a6b; font: 800 1.1rem/1 var(--font-display); clip-path: polygon(50% 0, 61% 22%, 86% 8%, 78% 36%, 100% 50%, 78% 64%, 86% 92%, 61% 78%, 50% 100%, 39% 78%, 14% 92%, 22% 64%, 0 50%, 22% 36%, 14% 8%, 39% 22%); animation: fx-boom 2.4s ease-out infinite; }
+@keyframes fx-bounce { from { transform: translateY(0) scaleY(.85); } to { transform: translateY(-36px); } }
+@keyframes fx-boom { 0% { transform: scale(.2) rotate(-15deg); opacity: 0; } 15% { transform: scale(1.15) rotate(4deg); opacity: 1; } 25%, 80% { transform: scale(1) rotate(0); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+
+/* Sdrogo Corse: strada che scorre, bandiera a scacchi, scritta neon */
+.fx-gta .road { left: 0; right: 0; top: 50%; height: 4px; margin-top: -2px; background: repeating-linear-gradient(90deg, #fff 0 34px, transparent 34px 68px); opacity: .5; animation: fx-road .6s linear infinite; }
+.fx-gta .chk { right: 6%; top: 12px; width: 48px; height: 40px; background: repeating-conic-gradient(#fff 0 25%, #111 0 50%) 0 0 / 16px 16px; border: 2px solid #fff; transform-origin: left center; animation: fx-wave 1s ease-in-out infinite alternate; }
+.fx-gta b { left: 4%; top: 50%; transform: translateY(-50%); padding: 0 10px; background: var(--fairway); font: 800 1.5rem/1 var(--font-display); letter-spacing: .08em; color: var(--flag); text-shadow: 0 0 8px var(--flag), 0 0 18px var(--flag); animation: fx-flick 3s steps(1) infinite; }
+@keyframes fx-road { to { background-position: -68px 0; } }
+@keyframes fx-flick { 0%, 91%, 93%, 95%, 100% { opacity: 1; } 92% { opacity: .4; } 94% { opacity: .6; } }
+
+/* Spazi pubblicitari: visibili solo con un circuito configurato e il consenso */
+.ad-slot { display: grid; place-items: center; min-height: 90px; margin: 16px 0; border: 1px dashed var(--line); border-radius: 8px; background: var(--chip); color: var(--muted); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; }
+.ad-slot[hidden] { display: none; }
+
+/* Banner cookie */
+.cookie { position: fixed; z-index: 50; left: 16px; right: 16px; bottom: 16px; max-width: 640px; margin-inline: auto; padding: 16px 18px; border-radius: 12px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); box-shadow: 0 12px 40px rgb(0 0 0 / .25); }
+.cookie[hidden], .cookie-opt[hidden] { display: none; }
+.cookie p { margin: 0 0 10px; font-size: .92rem; }
+.cookie a { color: inherit; }
+.cookie-opt { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; font-size: .92rem; }
+.cookie-btn { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.cookie-btn button { border: 1px solid var(--line); background: transparent; color: var(--ink); padding: 9px 14px; border-radius: 8px; font: 600 .95rem/1 var(--font-display); letter-spacing: .05em; text-transform: uppercase; cursor: pointer; }
+.cookie-btn button.primary { background: var(--fairway); color: var(--fairway-ink); border-color: var(--fairway); }
+.footer-links { margin-top: 8px; }
+.footer-links a, .linkish { color: inherit; }
+.linkish { border: 0; padding: 0; background: none; font: inherit; text-decoration: underline; cursor: pointer; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fx *, .fx > div { animation: none !important; }
+  .fx-golf .ball { left: calc(92% - 18px); }
+  .fx-uno i { transform: rotate(var(--r)); }
+  .fx-uno b, .fx-sbg b { opacity: 1; transform: none; }
+}

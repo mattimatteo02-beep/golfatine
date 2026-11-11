@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 <header class="topbar">
@@ -30,6 +31,8 @@
     <a class="club-chip" id="club-chip" href="#profilo">Accedi</a>
   </div>
 </header>
+
+<div class="wrap"><aside class="ad-slot" hidden aria-label="Pubblicità"><span>Pubblicità</span></aside></div>
 
 <main id="top">
   <section class="hero" data-view="home">
@@ -98,6 +101,12 @@
         <label class="sel"><span>Stagione</span><select id="season-sel"></select></label>
       </div>
     </div>
+    <div class="fx" aria-hidden="true">
+      <div class="fx-golf"><i class="ball"></i><i class="flag"></i></div>
+      <div class="fx-uno"><i></i><i></i><i></i><i></i><b>+4</b></div>
+      <div class="fx-sbg"><i></i><i></i><i></i><b>BOOM!</b></div>
+      <div class="fx-gta"><i class="road"></i><i class="chk"></i><b>SDROGO CORSE</b></div>
+    </div>
     <p class="note" id="table-note"></p>
     <div class="scroll"><table class="lb" id="lb"></table></div>
   </section>
@@ -157,7 +166,7 @@
       <div>
         <h3>Cosa manca</h3>
         <ul>
-          <li>GTA non è incluso: troppi video e troppo vecchi.</li>
+          <li>GTA conta solo dal 2016 in poi; 2 video con limite d'età non sono leggibili.</li>
           <li>Trackmania arriverà più avanti, compilato a mano.</li>
           <li id="unreadable-line"></li>
         </ul>
@@ -167,15 +176,28 @@
   </section>
 </main>
 
+<div class="wrap"><aside class="ad-slot" hidden aria-label="Pubblicità"><span>Pubblicità</span></aside></div>
+
 <footer class="footer">
   <div class="wrap" id="footer"></div>
+  <div class="wrap footer-links"><a href="cookie.html">Cookie e privacy</a> · <button type="button" class="linkish" id="cookie-open">Preferenze cookie</button></div>
 </footer>
 
+<div class="cookie" id="cookie" role="dialog" aria-labelledby="cookie-t" hidden>
+  <p id="cookie-t"><strong>Cookie</strong> · Usiamo solo lo stretto necessario per farti accedere al club. Se accetti, mostriamo anche pubblicità che possono usare cookie di terze parti. <a href="cookie.html">Dettagli</a></p>
+  <label class="cookie-opt" hidden><input type="checkbox" id="cookie-ads"> Pubblicità personalizzate</label>
+  <div class="cookie-btn">
+    <button type="button" data-c="no">Rifiuta</button>
+    <button type="button" data-c="custom">Personalizza</button>
+    <button type="button" data-c="yes" class="primary">Accetta</button>
+  </div>
+</div>
 <div class="toast" id="toast" role="status" hidden></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script src="club.js"></script>
+<script src="theme.js"></script>
 </body>
 </html>

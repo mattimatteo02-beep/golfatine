@@ -140,6 +140,7 @@
   // ---------- classifiche ----------
   const state = { game: "golf", season: CUR };
   function renderGameSeg() {
+    document.body.dataset.game = state.game;
     $("game-seg").innerHTML = D.games.map((g) => `<button type="button" role="tab" aria-selected="${g.id === state.game}" data-g="${g.id}">${esc(g.short)}</button>`).join("");
     const seasons = GAME[state.game].seasons;
     if (state.season !== "all" && !seasons.includes(state.season)) state.season = seasons[0];
