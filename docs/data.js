@@ -14971,7 +14971,24 @@ window.GOLFATINE = {
    "note": "risultato non disponibile"
   }
  ],
- "pending": [],
+ "pending": [
+  {
+   "id": "uZ2PVrENVig",
+   "date": "2026-11-11",
+   "season": 2026,
+   "game": "golf",
+   "channel": "Around Dread",
+   "title": "GOLFATINA DA MATTI con Dread, Gabbo, Rohn, Mollu, Delux",
+   "url": "https://www.youtube.com/watch?v=uZ2PVrENVig",
+   "players": [
+    "rohn",
+    "delux",
+    "gabbo",
+    "dread",
+    "mollu"
+   ]
+  }
+ ],
  "maps": {
   "A Little Adventure": [
    1,
