@@ -269,7 +269,8 @@
         <p class="note small">Email: ${esc(state.session.user.email || "")}</p>
         <input type="email" hidden autocomplete="username" value="${esc(state.session.user.email || "")}">
         <label class="field"><span>Nuova password (almeno 6 caratteri)</span><input id="pw-new" type="password" required minlength="6" autocomplete="new-password"></label>
-        <button class="btn" type="submit">Cambia password</button>
+        <label class="field"><span>Ripeti la nuova password</span><input id="pw-new2" type="password" required minlength="6" autocomplete="new-password"></label>
+        <button class="btn" type="submit">Salva modifiche</button>
         <p class="msg" id="pw-msg" role="status"></p>
       </form>
       <div class="acct"><p class="acct-title">I miei pronostici</p><div id="my-bets"><p class="note small">Caricamento…</p></div></div>
@@ -290,11 +291,21 @@
     el.querySelector("#pw-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const m = el.querySelector("#pw-msg");
+      const pw = el.querySelector("#pw-new").value, pw2 = el.querySelector("#pw-new2").value;
+      if (pw.length < 6) { m.textContent = "La password deve avere almeno 6 caratteri."; return; }
+      if (pw !== pw2) { m.textContent = "Le due password non sono uguali: riscrivile."; return; }
       m.textContent = "Salvataggio…";
-      const { error } = await sb.auth.updateUser({ password: el.querySelector("#pw-new").value });
-      if (error) { m.textContent = /different from the old/i.test(error.message) ? "È uguale a quella di prima: scegline una nuova." : authError(error); return; }
-      el.querySelector("#pw-new").value = "";
-      m.textContent = "Password cambiata.";
+      const { error } = await sb.auth.updateUser({ password: pw });
+      if (error) {
+        const t = error.message || "";
+        m.textContent = /different from the old/i.test(t) ? "È uguale a quella di prima: scegline una nuova."
+          : /reauthenticat|session|jwt|expired/i.test(t) ? "Per sicurezza esci, rientra e riprova a cambiare la password."
+          : authError(error);
+        return;
+      }
+      el.querySelector("#pw-new").value = ""; el.querySelector("#pw-new2").value = "";
+      m.textContent = "Password cambiata: dalla prossima volta usa quella nuova.";
+      document.dispatchEvent(new CustomEvent("club:toast", { detail: "Password cambiata" }));
     });
     const [{ data: bets, error: e1 }, { data: tx, error: e2 }] = await Promise.all([
       sb.from("bets").select("amount, payout, created_at, picks, options(label), markets(question, status, kind, options!market_id(id, label)), option_id").eq("user_id", p.id).order("created_at", { ascending: false }).limit(30),
