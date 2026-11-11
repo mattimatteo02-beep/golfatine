@@ -1,36 +1,30 @@
-/* Temi per gioco: i colori seguono il gioco scelto in Classifiche (body[data-game], impostato da app.js). */
-/* Base neutra grigio scuro; il colore del gioco resta negli accenti (--brand pieno, --brand-hi acceso). */
-body { --fairway: #1c1d20; --fairway-ink: #f2f2f2; --brand: #0f4a34; --brand-hi: #2fa152; }
+/* Sito grigio scuro neutro; i colori del gioco valgono solo in Classifiche (body[data-page][data-game], da app.js). */
+body { --fairway: #1c1d20; --fairway-ink: #f2f2f2; --brand: #2a2b2e; --brand-hi: #3a3c40; --flag: #dcdcdc; --focus: #dcdcdc; }
+body[data-page="classifiche"][data-game="golf"] { --brand: #0f4a34; --brand-hi: #2fa152; --flag: #f2c230; --focus: #5fd19c; }
 .topbar { box-shadow: inset 0 -2px 0 var(--brand-hi); }
-.hero { position: relative; box-shadow: inset 0 -2px 0 var(--brand-hi); }
-.hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 60% 90% at 80% 50%, color-mix(in srgb, var(--brand-hi) 22%, transparent), transparent 70%); }
-.hero-in { position: relative; z-index: 1; }
+.hero { box-shadow: inset 0 -1px 0 var(--line); }
 .cookie-btn button.primary { background: var(--flag); border-color: var(--flag); color: #14120a; }
-body[data-game="uno"] { --brand: #b5121b; --brand-hi: #e3202b; --flag: #f7d117; --focus: #f7d117; }
-body[data-game="sbg"] { --brand: #142a6b; --brand-hi: #3d63ff; --flag: #ff7a1a; --focus: #ff9a4d; }
-body[data-game="gta"] { --brand: #0e0b14; --brand-hi: #b026ff; --flag: #d13bff; --focus: #ff8a1f; --neon: linear-gradient(90deg, #b026ff, #ff2bd6 50%, #ff8a1f); }
+body[data-page="classifiche"][data-game="uno"] { --brand: #b5121b; --brand-hi: #e3202b; --flag: #f7d117; --focus: #f7d117; }
+body[data-page="classifiche"][data-game="sbg"] { --brand: #142a6b; --brand-hi: #3d63ff; --flag: #ff7a1a; --focus: #ff9a4d; }
+body[data-page="classifiche"][data-game="gta"] { --brand: #0e0b14; --brand-hi: #b026ff; --flag: #d13bff; --focus: #ff8a1f; --neon: linear-gradient(90deg, #b026ff, #ff2bd6 50%, #ff8a1f); }
 /* Sdrogo Corse: sfumatura neon viola -> arancione al posto del colore pieno */
-body[data-game="gta"] :is(.club-chip, .btn.cta, .seg button[aria-selected="true"], .cookie-btn button.primary, .strip-tag, .pod-badge) { background: var(--neon); border-color: transparent; color: #fff; }
-body[data-game="gta"] .topbar { box-shadow: inset 0 -2px 0 #b026ff, 0 2px 14px rgb(176 38 255 / .35); }
-body[data-game="gta"] .eyebrow { background: var(--neon); -webkit-background-clip: text; background-clip: text; color: transparent; }
-body[data-game="gta"] .lb tr.first { background: linear-gradient(90deg, rgb(176 38 255 / .22), rgb(255 138 31 / .22)); }
-body[data-game="gta"] .lb tr.first td { background: none; }
-body[data-game="gta"] .bar { background: var(--neon); opacity: .9; }
+body[data-page="classifiche"][data-game="gta"] :is(.club-chip, .btn.cta, .seg button[aria-selected="true"], .cookie-btn button.primary, .strip-tag, .pod-badge) { background: var(--neon); border-color: transparent; color: #fff; }
+body[data-page="classifiche"][data-game="gta"] .topbar { box-shadow: inset 0 -2px 0 #b026ff, 0 2px 14px rgb(176 38 255 / .35); }
+body[data-page="classifiche"][data-game="gta"] .eyebrow { background: var(--neon); -webkit-background-clip: text; background-clip: text; color: transparent; }
+body[data-page="classifiche"][data-game="gta"] .lb tr.first { background: linear-gradient(90deg, rgb(176 38 255 / .22), rgb(255 138 31 / .22)); }
+body[data-page="classifiche"][data-game="gta"] .lb tr.first td { background: none; }
+body[data-page="classifiche"][data-game="gta"] .bar { background: var(--neon); opacity: .9; }
 /* Tema scuro di default: gli accenti scuri sul fondo scuro passano al colore acceso */
 .bar { background: var(--flag); opacity: .8; }
 .seg button[aria-selected="true"] { background: var(--flag); color: #14120a; }
 .opt.pick.chosen { border-color: var(--flag); box-shadow: 0 0 0 2px var(--flag); }
 .opt .opt-bar { background: color-mix(in srgb, var(--flag) 16%, transparent); }
 .hero, .topbar, .seg button { transition: background-color .4s ease, color .4s ease; }
-body[data-game="golf"] .hero { background-image: repeating-linear-gradient(90deg, rgb(255 255 255 / .025) 0 60px, transparent 60px 120px); }
-body[data-game="uno"] .hero { background-image: repeating-linear-gradient(135deg, rgb(227 32 43 / .08) 0 40px, transparent 40px 80px); }
-body[data-game="sbg"] .hero { background-image: radial-gradient(rgb(255 255 255 / .09) 2px, transparent 2.5px); background-size: 22px 22px; }
-body[data-game="gta"] .hero { background-image: repeating-linear-gradient(90deg, transparent 0 calc(50% - 3px), rgb(209 59 255 / .35) calc(50% - 3px) calc(50% + 3px), transparent calc(50% + 3px) 100%); }
 
 /* Banda animata sopra la classifica */
 .fx { position: relative; height: 64px; margin: 14px 0 4px; border-radius: 10px; overflow: hidden; background: var(--brand); color: #fff; }
 .fx > div { display: none; position: absolute; inset: 0; }
-body[data-game="golf"] .fx-golf, body[data-game="uno"] .fx-uno, body[data-game="sbg"] .fx-sbg, body[data-game="gta"] .fx-gta { display: block; }
+body[data-page="classifiche"][data-game="golf"] .fx-golf, body[data-page="classifiche"][data-game="uno"] .fx-uno, body[data-page="classifiche"][data-game="sbg"] .fx-sbg, body[data-page="classifiche"][data-game="gta"] .fx-gta { display: block; }
 .fx i, .fx b { position: absolute; display: block; }
 
 /* golf: erba a strisce, pallina che rotola verso la bandiera */
