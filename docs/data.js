@@ -1,7 +1,7 @@
 // File generato da scripts/build_data.py: non modificarlo a mano.
 window.GOLFATINE = {
  "updated": "2026-11-11",
- "lastMatch": "2026-11-10",
+ "lastMatch": "2026-11-11",
  "players": {
   "dread": {
    "name": "Dread",
@@ -133,6 +133,55 @@ window.GOLFATINE = {
   }
  ],
  "matches": [
+  {
+   "id": "uZ2PVrENVig",
+   "date": "2026-11-11",
+   "season": 2026,
+   "game": "golf",
+   "channel": "Around Dread",
+   "title": "GOLFATINA DA MATTI con Dread, Gabbo, Rohn, Mollu, Delux",
+   "url": "https://www.youtube.com/watch?v=uZ2PVrENVig",
+   "map": "Trickshots auf Marbella",
+   "par": 80,
+   "results": [
+    {
+     "p": "delux",
+     "pos": 1,
+     "strokes": 60,
+     "hio": 1,
+     "toPar": -20
+    },
+    {
+     "p": "rohn",
+     "pos": 2,
+     "strokes": 73,
+     "hio": 1,
+     "toPar": -7
+    },
+    {
+     "p": "dread",
+     "pos": 3,
+     "strokes": 82,
+     "hio": 0,
+     "toPar": 2
+    },
+    {
+     "p": "gabbo",
+     "pos": 4,
+     "strokes": 83,
+     "hio": 2,
+     "toPar": 3
+    },
+    {
+     "p": "mollu",
+     "pos": 5,
+     "strokes": 85,
+     "hio": 2,
+     "toPar": 5
+    }
+   ],
+   "note": "tabellone finale letto dal video"
+  },
   {
    "id": "QsWnUQ9bbss",
    "date": "2026-11-10",
@@ -14971,24 +15020,7 @@ window.GOLFATINE = {
    "note": "risultato non disponibile"
   }
  ],
- "pending": [
-  {
-   "id": "uZ2PVrENVig",
-   "date": "2026-11-11",
-   "season": 2026,
-   "game": "golf",
-   "channel": "Around Dread",
-   "title": "GOLFATINA DA MATTI con Dread, Gabbo, Rohn, Mollu, Delux",
-   "url": "https://www.youtube.com/watch?v=uZ2PVrENVig",
-   "players": [
-    "rohn",
-    "delux",
-    "gabbo",
-    "dread",
-    "mollu"
-   ]
-  }
- ],
+ "pending": [],
  "maps": {
   "A Little Adventure": [
    1,
@@ -16777,6 +16809,26 @@ window.GOLFATINE = {
    4,
    4,
    4
+  ],
+  "Trickshots auf Marbella": [
+   3,
+   5,
+   4,
+   1,
+   3,
+   3,
+   4,
+   7,
+   4,
+   6,
+   5,
+   6,
+   8,
+   5,
+   6,
+   3,
+   2,
+   5
   ],
   "Trickster Castle": [
    2,
