@@ -6,7 +6,7 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const GAME = Object.fromEntries(D.games.map((g) => [g.id, g]));
   // Ogni giocatore ha la sua pallina (stessi colori degli avatar dei fan)
-  const COLORS = { rohn: "#d7263d", dread: "#f06aa8", delux: "#2fa152", gabbo: "#f28c18", mollu: "#8250c8", jtaz: "#1f3f94", masseo: "#4fb3f0" };
+  const COLORS = { rohn: "#d7263d", dread: "#f06aa8", delux: "#2fa152", gabbo: "#f28c18", mollu: "#8250c8", jtaz: "#4a6fe0", masseo: "#4fb3f0" };
   const DIMPLES = [[11, 9], [17, 8], [22, 11], [8, 15], [14, 14], [20, 16], [25, 17], [10, 21], [16, 20], [22, 22], [13, 26], [19, 26]];
   const core = Object.keys(D.players).filter((p) => !D.players[p].guest);
 

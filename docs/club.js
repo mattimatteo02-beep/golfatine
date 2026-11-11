@@ -297,7 +297,7 @@
       m.textContent = "Password cambiata.";
     });
     const [{ data: bets, error: e1 }, { data: tx, error: e2 }] = await Promise.all([
-      sb.from("bets").select("amount, payout, created_at, picks, options(label), markets(question, status, kind, options(id, label)), option_id").eq("user_id", p.id).order("created_at", { ascending: false }).limit(30),
+      sb.from("bets").select("amount, payout, created_at, picks, options(label), markets(question, status, kind, options!market_id(id, label)), option_id").eq("user_id", p.id).order("created_at", { ascending: false }).limit(30),
       sb.from("transactions").select("amount, reason, created_at").eq("user_id", p.id).order("created_at", { ascending: false }).limit(20),
     ]);
     const betsEl = el.querySelector("#my-bets"), txEl = el.querySelector("#my-tx");
@@ -347,7 +347,7 @@
 
   // Post con domande, opzioni e montepremi
   async function loadPosts({ all = false } = {}) {
-    let q = sb.from("posts").select("*, markets(*, options(*))").order("created_at", { ascending: false }).limit(all ? 100 : 30);
+    let q = sb.from("posts").select("*, markets(*, options!market_id(*))").order("created_at", { ascending: false }).limit(all ? 100 : 30);
     if (!all) q = q.eq("published", true);
     const { data: posts, error } = await q;
     if (error) throw error;
