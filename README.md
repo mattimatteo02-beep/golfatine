@@ -1,6 +1,8 @@
-# Golfatine
+# UMC · United Melagodo Championship
 
-Sito delle classifiche delle golfatine del gruppo MELAGODO: ogni video è una partita, ogni anno è una stagione.
+![UMC](docs/umc-logo.svg)
+
+Sito della UMC (United Melagodo Championship), le classifiche del gruppo MELAGODO; per ora contiene le golfatine: ogni video è una partita, ogni anno è una stagione.
 
 ## Struttura
 
