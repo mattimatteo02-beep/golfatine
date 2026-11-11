@@ -35,13 +35,14 @@
     for (const m of ms) {
       for (const r of m.results) {
         if (guest(r.p)) continue;
-        const s = (t[r.p] ||= { p: r.p, played: 0, wins: 0, podi: 0, posSum: 0, posN: 0, toPar: [], hio: 0 });
+        const s = (t[r.p] ||= { p: r.p, played: 0, wins: 0, podi: 0, posSum: 0, posN: 0, toPar: [], hio: 0, races: 0 });
         s.played++;
         if (r.pos === 1) s.wins++;
         if (r.pos != null && r.pos <= 3) s.podi++;
         if (r.pos != null) { s.posSum += r.pos; s.posN++; }
         if (r.toPar != null) s.toPar.push(r.toPar);
         if (r.hio) s.hio += r.hio;
+        if (r.races) s.races += r.races;
       }
     }
     const rows = Object.values(t).map((s) => ({
@@ -51,12 +52,12 @@
       pct: s.played ? (100 * s.wins) / s.played : 0,
     }));
     const byPos = GAME[game].mode !== "vincitore";
-    rows.sort((a, b) => b.wins - a.wins || (byPos ? b.podi - a.podi || (a.avgPos ?? 99) - (b.avgPos ?? 99) : b.pct - a.pct) || b.played - a.played);
+    rows.sort((a, b) => b.wins - a.wins || b.races - a.races || (byPos ? b.podi - a.podi || (a.avgPos ?? 99) - (b.avgPos ?? 99) : b.pct - a.pct) || b.played - a.played);
     return { matches: ms.length, rows, byPos };
   }
 
   function sameRank(a, b, byPos) {
-    return a.wins === b.wins && (byPos ? a.podi === b.podi && Math.abs((a.avgPos ?? 0) - (b.avgPos ?? 0)) < 1e-9 : a.pct === b.pct);
+    return a.wins === b.wins && a.races === b.races && (byPos ? a.podi === b.podi && Math.abs((a.avgPos ?? 0) - (b.avgPos ?? 0)) < 1e-9 : a.pct === b.pct);
   }
 
   function champions(game, season) {
@@ -107,6 +108,7 @@
     if (m.format === "punti") bits.push("modalità a punti");
     if (m.format === "squadre") bits.push("a squadre");
     if (m.game === "uno") bits.push("conta solo il vincitore");
+    if (m.list) bits.push(`elenco “${esc(m.list)}”`);
     return bits.join(" · ");
   }
 
@@ -149,10 +151,12 @@
     const g = GAME[state.game];
     const st = standings(state.game, season);
     const golf = state.game === "golf";
+    const gta = state.game === "gta";
     const maxW = Math.max(1, ...st.rows.map((r) => r.wins));
     $("table-note").textContent = `${g.name}, ${season == null ? "tutte le stagioni" : "stagione " + season}: ${st.matches} partite.` +
-      (st.byPos ? "" : " Per UNO conta solo il vincitore del video, quindi podi e posizione media non ci sono.");
-    const head = ["Pos", "Giocatore", "Partite", "Vittorie", "% vittorie"].concat(st.byPos ? ["Podi", "Pos. media"] : []).concat(golf ? ["Media vs par", "Hole in one"] : []);
+      (st.byPos ? "" : " Per UNO conta solo il vincitore del video, quindi podi e posizione media non ci sono.") +
+      (gta ? " Ogni video è un elenco di gare: vince chi chiude primo l'elenco. A pari vittorie contano le singole gare vinte." : "");
+    const head = ["Pos", "Giocatore", "Partite", "Vittorie", "% vittorie"].concat(st.byPos ? ["Podi", "Pos. media"] : []).concat(golf ? ["Media vs par", "Hole in one"] : []).concat(gta ? ["Gare vinte"] : []);
     let prev = null, rank = 0;
     $("lb").innerHTML = `<thead><tr>${head.map((h) => `<th scope="col">${h}</th>`).join("")}</tr></thead><tbody>` +
       (st.rows.length ? st.rows.map((r, i) => {
@@ -166,6 +170,7 @@
           <td>${fmt(r.pct, 0)}%</td>
           ${st.byPos ? `<td>${r.podi}</td><td>${r.avgPos == null ? "–" : fmt(r.avgPos, 2)}</td>` : ""}
           ${golf ? `<td>${par(r.avgPar, 1)}</td><td>${r.hio}</td>` : ""}
+          ${gta ? `<td>${r.races}</td>` : ""}
         </tr>`;
       }).join("") : `<tr><td colspan="${head.length}" class="empty">Nessuna partita.</td></tr>`) + `</tbody>`;
   }

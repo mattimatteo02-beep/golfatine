@@ -7,8 +7,10 @@ Regole (le stesse del foglio "Classifiche" del modello):
 - ogni video è una partita; le stagioni sono gli anni solari;
 - Golf With Your Friends e Super Battle Golf: conta la posizione finale di ogni giocatore;
 - UNO: conta solo il vincitore del video;
+- Sdrogo Corse (GTA V, dal 2016): ogni video è un elenco di gare, conta la posizione finale
+  nell'elenco; in più si contano le singole gare vinte;
 - pari merito al 1° posto = vittoria per tutti;
-- GTA e Trackmania per ora non sono inclusi.
+- Trackmania per ora non è incluso.
 """
 import datetime
 import json
@@ -28,6 +30,7 @@ GAMES = {
     "Golf With Your Friends": {"id": "golf", "name": "Golf With Your Friends", "short": "Golf", "mode": "posizioni"},
     "Super Battle Golf": {"id": "sbg", "name": "Super Battle Golf", "short": "Super Battle Golf", "mode": "posizioni"},
     "UNO": {"id": "uno", "name": "UNO", "short": "UNO", "mode": "vincitore"},
+    "GTA V Online": {"id": "gta", "name": "Sdrogo Corse (GTA V)", "short": "Sdrogo Corse", "mode": "posizioni"},
 }
 
 
@@ -107,7 +110,8 @@ def rows(ws):
 
 
 def ids(text):
-    return [x.strip() for x in str(text or "").split(",") if x.strip()]
+    # gli ospiti nel foglio sono scritti "nome (ospite)": sul sito l'ospite si riconosce da solo
+    return [x.strip().removesuffix(" (ospite)") for x in str(text or "").split(",") if x.strip()]
 
 
 def main():
@@ -136,6 +140,9 @@ def main():
     sbg = {}
     for r in rows(wb["Super_Battle_Golf"]):
         sbg.setdefault(r["video_id"], []).append(r)
+    gta = {}
+    for r in rows(wb["GTA_Corse"]):
+        gta.setdefault(r["video_id"], []).append(r)
 
     matches, unreadable, pending = [], [], []
     for r in rows(wb["Partite"]):
@@ -193,6 +200,20 @@ def main():
                     except ValueError:
                         pass
                 results.append(res)
+        elif game["id"] == "gta" and r["video_id"] in gta:
+            for g in gta[r["video_id"]]:
+                note = str(g["note"] or "")
+                pos = re.search(r"posizione (\d+)", note)
+                tot = re.search(r"totale (\d+)", note)
+                res = {"p": ids(g["giocatore_id"])[0], "pos": int(pos.group(1)) if pos else None}
+                if tot:
+                    res["points"] = int(tot.group(1))
+                if isinstance(g["primi_posti"], int):
+                    res["races"] = g["primi_posti"]
+                results.append(res)
+            lista = re.search(r"lista '([^']+)'", str(r["note"] or ""))
+            if lista:
+                base["list"] = lista.group(1)
         elif game["id"] == "uno" and r["vincitore"]:
             winners = set(ids(r["vincitore"]))
             parts = ids(r["partecipanti"])
