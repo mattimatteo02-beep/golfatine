@@ -368,7 +368,6 @@
     const views = new Set(sections.map((s) => s.dataset.view));
     const view = views.has(h) ? h : VIEW_OF[h] || "home";
     sections.forEach((s) => (s.hidden = s.dataset.view !== view));
-    document.body.dataset.page = view; // i colori del gioco valgono solo in Classifiche (theme.css)
     document.querySelectorAll(".nav a").forEach((a) => {
       if (a.getAttribute("href") === "#" + view) a.setAttribute("aria-current", "page");
       else a.removeAttribute("aria-current");
