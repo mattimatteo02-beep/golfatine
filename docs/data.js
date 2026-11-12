@@ -1,7 +1,7 @@
 // File generato da scripts/build_data.py: non modificarlo a mano.
 window.GOLFATINE = {
  "updated": "2026-11-12",
- "lastMatch": "2026-11-11",
+ "lastMatch": "2026-11-12",
  "players": {
   "dread": {
    "name": "Dread",
@@ -134,6 +134,55 @@ window.GOLFATINE = {
   }
  ],
  "matches": [
+  {
+   "id": "PKGntade0T0",
+   "date": "2026-11-12",
+   "season": 2026,
+   "game": "golf",
+   "channel": "Delux",
+   "title": "LA NUOVA ERA DELLE GOLFATINE. con Delux, Dread, Gabbo, Mollu & Tele Rohn",
+   "url": "https://www.youtube.com/watch?v=PKGntade0T0",
+   "map": "Progetto Telerhon",
+   "par": 77,
+   "results": [
+    {
+     "p": "mollu",
+     "pos": 1,
+     "strokes": 88,
+     "hio": 1,
+     "toPar": 11
+    },
+    {
+     "p": "rohn",
+     "pos": 2,
+     "strokes": 93,
+     "hio": 0,
+     "toPar": 16
+    },
+    {
+     "p": "delux",
+     "pos": 3,
+     "strokes": 97,
+     "hio": 1,
+     "toPar": 20
+    },
+    {
+     "p": "dread",
+     "pos": 4,
+     "strokes": 126,
+     "hio": 1,
+     "toPar": 49
+    },
+    {
+     "p": "gabbo",
+     "pos": 5,
+     "strokes": 129,
+     "hio": 0,
+     "toPar": 52
+    }
+   ],
+   "note": "tabellone finale letto dal video"
+  },
   {
    "id": "uZ2PVrENVig",
    "date": "2026-11-11",
@@ -16571,6 +16620,26 @@ window.GOLFATINE = {
    4,
    4,
    3
+  ],
+  "Progetto Telerhon": [
+   3,
+   3,
+   3,
+   5,
+   4,
+   4,
+   5,
+   4,
+   7,
+   6,
+   4,
+   3,
+   3,
+   6,
+   4,
+   4,
+   4,
+   5
   ],
   "Purple Rock": [
    2,
