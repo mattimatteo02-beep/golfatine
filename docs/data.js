@@ -1,6 +1,6 @@
 // File generato da scripts/build_data.py: non modificarlo a mano.
 window.GOLFATINE = {
- "updated": "2026-11-11",
+ "updated": "2026-11-12",
  "lastMatch": "2026-11-11",
  "players": {
   "dread": {
@@ -111,6 +111,7 @@ window.GOLFATINE = {
    "mode": "vincitore",
    "seasons": [
     2026,
+    2023,
     2021
    ]
   },
@@ -1282,7 +1283,91 @@ window.GOLFATINE = {
      "pos": null
     }
    ],
-   "note": "partita a 500 non finita nel video: Delux in testa con 289 (erfov 131, Dread 48, Gabbo 0) e si dichiara vincitore"
+   "note": "risultato dato da Matteo (12/11/2026); partita 1 di 3, tre partite, Gabbo non ne vince nessuna"
+  },
+  {
+   "id": "LkrOQaaBAq0",
+   "date": "2026-10-01",
+   "season": 2026,
+   "game": "uno",
+   "channel": "Delux",
+   "title": "UNO CONIGLI RABBIOSI. con Delux, Gabbo, Dread & Mollu",
+   "url": "https://www.youtube.com/watch?v=LkrOQaaBAq0",
+   "results": [
+    {
+     "p": "dread",
+     "pos": 1
+    },
+    {
+     "p": "delux",
+     "pos": null
+    },
+    {
+     "p": "gabbo",
+     "pos": null
+    },
+    {
+     "p": "mollu",
+     "pos": null
+    }
+   ],
+   "note": "risultato dato da Matteo (12/11/2026); partita 2 di 3, tre partite, Gabbo non ne vince nessuna"
+  },
+  {
+   "id": "LkrOQaaBAq0",
+   "date": "2026-10-01",
+   "season": 2026,
+   "game": "uno",
+   "channel": "Delux",
+   "title": "UNO CONIGLI RABBIOSI. con Delux, Gabbo, Dread & Mollu",
+   "url": "https://www.youtube.com/watch?v=LkrOQaaBAq0",
+   "results": [
+    {
+     "p": "mollu",
+     "pos": 1
+    },
+    {
+     "p": "dread",
+     "pos": null
+    },
+    {
+     "p": "delux",
+     "pos": null
+    },
+    {
+     "p": "gabbo",
+     "pos": null
+    }
+   ],
+   "note": "risultato dato da Matteo (12/11/2026); partita 3 di 3, tre partite, Gabbo non ne vince nessuna"
+  },
+  {
+   "id": "_K5QIDTh90Y",
+   "date": "2026-09-30",
+   "season": 2026,
+   "game": "uno",
+   "channel": "GaBBoDSQ",
+   "title": "UNO VICHINGO FOLLE con ilMasseo, Dread, Delu",
+   "url": "https://www.youtube.com/watch?v=_K5QIDTh90Y",
+   "results": [
+    {
+     "p": "gabbo",
+     "pos": 1
+    },
+    {
+     "p": "dread",
+     "pos": null
+    },
+    {
+     "p": "delux",
+     "pos": null
+    },
+    {
+     "p": "masseo",
+     "pos": null
+    }
+   ],
+   "note": "risultato dato da Matteo (12/11/2026); partita 1 di 3, tre partite, il Masseo non ne vince nessuna"
   },
   {
    "id": "_K5QIDTh90Y",
@@ -1302,11 +1387,43 @@ window.GOLFATINE = {
      "pos": null
     },
     {
+     "p": "delux",
+     "pos": null
+    },
+    {
      "p": "masseo",
      "pos": null
     }
    ],
-   "note": "partita a 300 interrotta ('direi di finire qua'): Dread in testa con 104, Gabbo 66, Masseo 0"
+   "note": "risultato dato da Matteo (12/11/2026); partita 2 di 3, tre partite, il Masseo non ne vince nessuna"
+  },
+  {
+   "id": "_K5QIDTh90Y",
+   "date": "2026-09-30",
+   "season": 2026,
+   "game": "uno",
+   "channel": "GaBBoDSQ",
+   "title": "UNO VICHINGO FOLLE con ilMasseo, Dread, Delu",
+   "url": "https://www.youtube.com/watch?v=_K5QIDTh90Y",
+   "results": [
+    {
+     "p": "delux",
+     "pos": 1
+    },
+    {
+     "p": "gabbo",
+     "pos": null
+    },
+    {
+     "p": "dread",
+     "pos": null
+    },
+    {
+     "p": "masseo",
+     "pos": null
+    }
+   ],
+   "note": "risultato dato da Matteo (12/11/2026); partita 3 di 3, tre partite, il Masseo non ne vince nessuna"
   },
   {
    "id": "UJWijuUfzLQ",
@@ -2142,6 +2259,30 @@ window.GOLFATINE = {
    ]
   },
   {
+   "id": "j9bezNnssZ8",
+   "date": "2026-08-27",
+   "season": 2026,
+   "game": "uno",
+   "channel": "GaBBoDSQ",
+   "title": "IL RITORNO DI PISELLI UNITIIII AMICI INFINITIII - UNO PARTY MANIA con Dreaddonico, Smollura e Paolo",
+   "url": "https://www.youtube.com/watch?v=j9bezNnssZ8",
+   "results": [
+    {
+     "p": "gabbo",
+     "pos": 1
+    },
+    {
+     "p": "dread",
+     "pos": null
+    },
+    {
+     "p": "mollu",
+     "pos": null
+    }
+   ],
+   "note": "risultato dato da Matteo (12/11/2026)"
+  },
+  {
    "id": "1mMxDTw_ytQ",
    "date": "2026-08-26",
    "season": 2026,
@@ -2849,6 +2990,62 @@ window.GOLFATINE = {
    "url": "https://www.youtube.com/watch?v=aAeiu8TLg2U",
    "results": [
     {
+     "p": "gabbo",
+     "pos": 1
+    },
+    {
+     "p": "dread",
+     "pos": null
+    },
+    {
+     "p": "delux",
+     "pos": null
+    },
+    {
+     "p": "rohn",
+     "pos": null
+    }
+   ],
+   "note": "risultato dato da Matteo (12/11/2026); partita 1 di 3, tre partite, Dread non ne vince nessuna"
+  },
+  {
+   "id": "aAeiu8TLg2U",
+   "date": "2026-07-19",
+   "season": 2026,
+   "game": "uno",
+   "channel": "GaBBoDSQ",
+   "title": "UNO PARTY!  - PISELLI UNITI AMICI INFINITIIIII w/ Rohn ( cieco ) , Dread e Delux",
+   "url": "https://www.youtube.com/watch?v=aAeiu8TLg2U",
+   "results": [
+    {
+     "p": "delux",
+     "pos": 1
+    },
+    {
+     "p": "gabbo",
+     "pos": null
+    },
+    {
+     "p": "dread",
+     "pos": null
+    },
+    {
+     "p": "rohn",
+     "pos": null
+    }
+   ],
+   "note": "risultato dato da Matteo (12/11/2026); partita 2 di 3, tre partite, Dread non ne vince nessuna"
+  },
+  {
+   "id": "aAeiu8TLg2U",
+   "date": "2026-07-19",
+   "season": 2026,
+   "game": "uno",
+   "channel": "GaBBoDSQ",
+   "title": "UNO PARTY!  - PISELLI UNITI AMICI INFINITIIIII w/ Rohn ( cieco ) , Dread e Delux",
+   "url": "https://www.youtube.com/watch?v=aAeiu8TLg2U",
+   "results": [
+    {
      "p": "rohn",
      "pos": 1
     },
@@ -2865,7 +3062,7 @@ window.GOLFATINE = {
      "pos": null
     }
    ],
-   "note": "partita a 500 non finita nel video: Rohn primo con 301, Delux 200, Gabbo 138, Dread 0"
+   "note": "risultato dato da Matteo (12/11/2026); partita 3 di 3, tre partite, Dread non ne vince nessuna"
   },
   {
    "id": "Utm999peUYg",
@@ -3922,6 +4119,34 @@ window.GOLFATINE = {
    ]
   },
   {
+   "id": "Pzu5TfOwiqk",
+   "date": "2026-06-06",
+   "season": 2026,
+   "game": "uno",
+   "channel": "Delux",
+   "title": "LA PARTITA DI UNO DA PROBLEMI MENTALI. con Delux, Dread, JimmyJones e Gubbiodismerdaland",
+   "url": "https://www.youtube.com/watch?v=Pzu5TfOwiqk",
+   "results": [
+    {
+     "p": "dread",
+     "pos": 1
+    },
+    {
+     "p": "delux",
+     "pos": null
+    },
+    {
+     "p": "gabbo",
+     "pos": null
+    },
+    {
+     "p": "JimmyJones",
+     "pos": null
+    }
+   ],
+   "note": "risultato dato da Matteo (12/11/2026); partita 1 di 3, tre partite, Gabbo (Gubbiodismerdaland) non ne vince nessuna"
+  },
+  {
    "id": "la960Us8FWQ",
    "date": "2026-06-06",
    "season": 2026,
@@ -3968,6 +4193,62 @@ window.GOLFATINE = {
      "toPar": 4
     }
    ]
+  },
+  {
+   "id": "Pzu5TfOwiqk",
+   "date": "2026-06-06",
+   "season": 2026,
+   "game": "uno",
+   "channel": "Delux",
+   "title": "LA PARTITA DI UNO DA PROBLEMI MENTALI. con Delux, Dread, JimmyJones e Gubbiodismerdaland",
+   "url": "https://www.youtube.com/watch?v=Pzu5TfOwiqk",
+   "results": [
+    {
+     "p": "delux",
+     "pos": 1
+    },
+    {
+     "p": "dread",
+     "pos": null
+    },
+    {
+     "p": "gabbo",
+     "pos": null
+    },
+    {
+     "p": "JimmyJones",
+     "pos": null
+    }
+   ],
+   "note": "risultato dato da Matteo (12/11/2026); partita 2 di 3, tre partite, Gabbo (Gubbiodismerdaland) non ne vince nessuna"
+  },
+  {
+   "id": "Pzu5TfOwiqk",
+   "date": "2026-06-06",
+   "season": 2026,
+   "game": "uno",
+   "channel": "Delux",
+   "title": "LA PARTITA DI UNO DA PROBLEMI MENTALI. con Delux, Dread, JimmyJones e Gubbiodismerdaland",
+   "url": "https://www.youtube.com/watch?v=Pzu5TfOwiqk",
+   "results": [
+    {
+     "p": "JimmyJones",
+     "pos": 1
+    },
+    {
+     "p": "dread",
+     "pos": null
+    },
+    {
+     "p": "delux",
+     "pos": null
+    },
+    {
+     "p": "gabbo",
+     "pos": null
+    }
+   ],
+   "note": "risultato dato da Matteo (12/11/2026); partita 3 di 3, tre partite, Gabbo (Gubbiodismerdaland) non ne vince nessuna"
   },
   {
    "id": "YleYm6W8AU4",
@@ -4108,6 +4389,90 @@ window.GOLFATINE = {
     }
    ],
    "note": "lista 'Roma Ladrona'; pari punti al 1 posto (45) tra JRohn7 e GaBBoDSQUARED, il gioco mette primo JRohn7"
+  },
+  {
+   "id": "eaVm75tjgi4",
+   "date": "2026-05-29",
+   "season": 2026,
+   "game": "uno",
+   "channel": "JTaz Extra",
+   "title": "CHI PESCA 25 CARTE VIENE ELIMINATO 🤯 UNO No Mercy con DREAD MASSEO MOLLU JTAZ",
+   "url": "https://www.youtube.com/watch?v=eaVm75tjgi4",
+   "results": [
+    {
+     "p": "mollu",
+     "pos": 1
+    },
+    {
+     "p": "dread",
+     "pos": null
+    },
+    {
+     "p": "masseo",
+     "pos": null
+    },
+    {
+     "p": "jtaz",
+     "pos": null
+    }
+   ],
+   "note": "risultato dato da Matteo (12/11/2026); partita 1 di 3, tre partite, Dread non ne vince nessuna"
+  },
+  {
+   "id": "eaVm75tjgi4",
+   "date": "2026-05-29",
+   "season": 2026,
+   "game": "uno",
+   "channel": "JTaz Extra",
+   "title": "CHI PESCA 25 CARTE VIENE ELIMINATO 🤯 UNO No Mercy con DREAD MASSEO MOLLU JTAZ",
+   "url": "https://www.youtube.com/watch?v=eaVm75tjgi4",
+   "results": [
+    {
+     "p": "masseo",
+     "pos": 1
+    },
+    {
+     "p": "dread",
+     "pos": null
+    },
+    {
+     "p": "mollu",
+     "pos": null
+    },
+    {
+     "p": "jtaz",
+     "pos": null
+    }
+   ],
+   "note": "risultato dato da Matteo (12/11/2026); partita 2 di 3, tre partite, Dread non ne vince nessuna"
+  },
+  {
+   "id": "eaVm75tjgi4",
+   "date": "2026-05-29",
+   "season": 2026,
+   "game": "uno",
+   "channel": "JTaz Extra",
+   "title": "CHI PESCA 25 CARTE VIENE ELIMINATO 🤯 UNO No Mercy con DREAD MASSEO MOLLU JTAZ",
+   "url": "https://www.youtube.com/watch?v=eaVm75tjgi4",
+   "results": [
+    {
+     "p": "jtaz",
+     "pos": 1
+    },
+    {
+     "p": "dread",
+     "pos": null
+    },
+    {
+     "p": "mollu",
+     "pos": null
+    },
+    {
+     "p": "masseo",
+     "pos": null
+    }
+   ],
+   "note": "risultato dato da Matteo (12/11/2026); partita 3 di 3, tre partite, Dread non ne vince nessuna"
   },
   {
    "id": "lj5-ddG4zTM",
@@ -5295,7 +5660,7 @@ window.GOLFATINE = {
      "pos": null
     }
    ],
-   "note": "partita a 300 non finita nel video: all'ultimo riepilogo Dread 1°, Rohn 2° (116), Gabbo e Delux 3°"
+   "note": "risultato dato da Matteo (12/11/2026)"
   },
   {
    "id": "HZoDpN9pAyQ",
@@ -5517,7 +5882,7 @@ window.GOLFATINE = {
      "pos": null
     }
    ],
-   "note": "riga aggiunta (video trovato controllando tutti i canali); partita a 500 non finita nel video: all'ultimo riepilogo Gabbo in testa con 300 (Mollu 253, Dread 238, Masseo 225)"
+   "note": "risultato dato da Matteo (12/11/2026)"
   },
   {
    "id": "L4LEuOwmnaY",
@@ -7288,6 +7653,26 @@ window.GOLFATINE = {
     }
    ],
    "note": "lista '%())*;#%'; lobby con 10 giocatori, quasi tutti esterni; vince Momo4Ruote (esterno)"
+  },
+  {
+   "id": "4UpH30xGDMw",
+   "date": "2023-01-16",
+   "season": 2023,
+   "game": "uno",
+   "channel": "Delux Rewind",
+   "title": "BASTA CONTESTAREE!! || UNO @JTaz @KodomohorrorE PESH",
+   "url": "https://www.youtube.com/watch?v=4UpH30xGDMw",
+   "results": [
+    {
+     "p": "jtaz",
+     "pos": 1
+    },
+    {
+     "p": "delux",
+     "pos": null
+    }
+   ],
+   "note": "risultato dato da Matteo (12/11/2026)"
   },
   {
    "id": "AhilT7KMljc",
@@ -13430,16 +13815,6 @@ window.GOLFATINE = {
    "note": "riga aggiunta (video non presente nel modello); risultato non leggibile: il video finisce durante una gara, senza tabellone finale"
   },
   {
-   "id": "j9bezNnssZ8",
-   "date": "2026-08-27",
-   "season": 2026,
-   "game": "uno",
-   "channel": "GaBBoDSQ",
-   "title": "IL RITORNO DI PISELLI UNITIIII AMICI INFINITIII - UNO PARTY MANIA con Dreaddonico, Smollura e Paolo",
-   "url": "https://www.youtube.com/watch?v=j9bezNnssZ8",
-   "note": "risultato non leggibile: il riepilogo finale mostra solo i punti del round, non il totale"
-  },
-  {
    "id": "f38uKJRIzss",
    "date": "2026-06-23",
    "season": 2026,
@@ -13468,26 +13843,6 @@ window.GOLFATINE = {
    "title": "SDROGO CORSE TEMPORALESCHE ( Dread hai esagerato ) w/ @oDeluxx @AroundDread @JustRoHn7 @Mollu",
    "url": "https://www.youtube.com/watch?v=LZLtiYWxPwk",
    "note": "risultato non leggibile: nessun tabellone finale negli ultimi 5 minuti"
-  },
-  {
-   "id": "Pzu5TfOwiqk",
-   "date": "2026-06-06",
-   "season": 2026,
-   "game": "uno",
-   "channel": "Delux",
-   "title": "LA PARTITA DI UNO DA PROBLEMI MENTALI. con Delux, Dread, JimmyJones e Gubbiodismerdaland",
-   "url": "https://www.youtube.com/watch?v=Pzu5TfOwiqk",
-   "note": "risultato non leggibile: il video finisce senza schermata finale"
-  },
-  {
-   "id": "eaVm75tjgi4",
-   "date": "2026-05-29",
-   "season": 2026,
-   "game": "uno",
-   "channel": "JTaz Extra",
-   "title": "CHI PESCA 25 CARTE VIENE ELIMINATO 🤯 UNO No Mercy con DREAD MASSEO MOLLU JTAZ",
-   "url": "https://www.youtube.com/watch?v=eaVm75tjgi4",
-   "note": "risultato non leggibile: il gioco crasha e il video finisce senza schermata finale"
   },
   {
    "id": "kO4zxE6BXPA",
@@ -13660,16 +14015,6 @@ window.GOLFATINE = {
    "note": "risultato non leggibile: solo la lobby prima dell'ultima gara negli ultimi 5 minuti"
   },
   {
-   "id": "zjcNTsnU7cs",
-   "date": "2024-05-10",
-   "season": 2024,
-   "game": "uno",
-   "channel": "Delux",
-   "title": "UNO MELAGOODIANO SENZA PIETA (si eliminano persone)",
-   "url": "https://www.youtube.com/watch?v=zjcNTsnU7cs",
-   "note": "riga aggiunta (video trovato controllando tutti i canali); risultato non leggibile: UNO dal vivo con le carte vere, nessun tabellone"
-  },
-  {
    "id": "CfCuKZm2R7I",
    "date": "2024-03-05",
    "season": 2024,
@@ -13728,26 +14073,6 @@ window.GOLFATINE = {
    "title": "LE PIÙ BELLE SDROGO CORSE DEL 2K23 W/ Dread, Blur, Gabbo, Marza, Jtaz, Fazz, Gianko",
    "url": "https://www.youtube.com/watch?v=o1zUao5ViYQ",
    "note": "risultato non leggibile: nessun tabellone finale negli ultimi 5 minuti"
-  },
-  {
-   "id": "I0YbsAcNoX8",
-   "date": "2023-02-06",
-   "season": 2023,
-   "game": "uno",
-   "channel": "JTaz",
-   "title": "UNO tra BACI e INSULTI con @ilMasseo @Dreadd @justrohn @oDeluxx (Giochi 🃏 Melagoodo)",
-   "url": "https://www.youtube.com/watch?v=I0YbsAcNoX8",
-   "note": "risultato non leggibile: UNO dal vivo, nessun tabellone"
-  },
-  {
-   "id": "4UpH30xGDMw",
-   "date": "2023-01-16",
-   "season": 2023,
-   "game": "uno",
-   "channel": "Delux Rewind",
-   "title": "BASTA CONTESTAREE!! || UNO @JTaz @KodomohorrorE PESH",
-   "url": "https://www.youtube.com/watch?v=4UpH30xGDMw",
-   "note": "risultato non leggibile: il video finisce senza schermata finale"
   },
   {
    "id": "Ey8JXx7c6Oc",
