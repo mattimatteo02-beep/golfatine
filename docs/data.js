@@ -1,6 +1,6 @@
 // File generato da scripts/build_data.py: non modificarlo a mano.
 window.GOLFATINE = {
- "updated": "2026-11-12",
+ "updated": "2026-11-13",
  "lastMatch": "2026-11-12",
  "players": {
   "dread": {
@@ -15394,7 +15394,24 @@ window.GOLFATINE = {
    "note": "risultato non disponibile"
   }
  ],
- "pending": [],
+ "pending": [
+  {
+   "id": "_2ScgmWE2WY",
+   "date": "2026-11-13",
+   "season": 2026,
+   "game": "golf",
+   "channel": "JTaz Extra",
+   "title": "L'ULTIMA GOLFATINA PRIMA DI GTA 6 ⛳️ con DREAD, DELUX, GABBO, MOLLU, JTAZ",
+   "url": "https://www.youtube.com/watch?v=_2ScgmWE2WY",
+   "players": [
+    "delux",
+    "gabbo",
+    "dread",
+    "mollu",
+    "jtaz"
+   ]
+  }
+ ],
  "maps": {
   "A Little Adventure": [
    1,
