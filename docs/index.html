@@ -10,8 +10,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=20261116a">
-<link rel="stylesheet" href="theme.css?v=20261116a">
+<link rel="stylesheet" href="style.css?v=20261116b">
+<link rel="stylesheet" href="theme.css?v=20261116b">
 </head>
 <body>
 <header class="topbar">
@@ -65,10 +65,37 @@
 
   <section id="pronostici" class="wrap section" data-view="pronostici">
     <h2 class="h2">Pronostici</h2>
-    <ol class="steps" id="club-steps"><li><span><strong>Registrati</strong> con nome utente, email e password: ricevi 1.000 gettoni gratis.</span></li><li><span><strong>Scegli</strong> chi vince il prossimo video di golf, Sdrogo Corse o UNO. I pronostici sono sempre aperti: valgono le puntate fatte prima che esca il video.</span></li><li><span><strong>Vinci</strong>: chi indovina si divide i gettoni di tutti.</span></li></ol>
+    <ol class="steps" id="club-steps"><li><span><strong>Registrati</strong> con nome utente, email e password: ricevi 1.000 gettoni gratis.</span></li><li><span><strong>Scegli</strong> chi vince il prossimo video di golf, Sdrogo Corse o UNO. I pronostici sono sempre aperti: valgono le puntate fatte prima che esca il video.</span></li><li><span><strong>Vinci</strong>: chi indovina si divide i gettoni di tutti. <a href="#come-funziona" data-open-how>Come funziona</a></span></li></ol>
     <div class="club">
       <div class="club-main">
         <div id="club-status"></div>
+        <details class="earn-box how-box" id="come-funziona"><summary>Come funzionano i pronostici</summary>
+          <div class="how">
+            <h4>Il prossimo video: sempre aperto</h4>
+            <p>Per golf, Sdrogo Corse e UNO c'è una domanda che non chiude mai: chi vince il prossimo video (e per golf e Sdrogo Corse anche il podio esatto). Non serve sapere quando esce: punti quando vuoi.</p>
+            <ul class="earn">
+              <li><strong>Contano le puntate fatte prima che il video esca su YouTube.</strong> L'ora di uscita la prende il sito da YouTube, al minuto.</li>
+              <li>Se punti <strong>dopo</strong> l'uscita, la puntata non si perde: vale per il video successivo dello stesso gioco.</li>
+              <li>Appena c'è il risultato, il sito paga da solo, di solito entro qualche ora.</li>
+            </ul>
+            <h4>Come si vince</h4>
+            <ul class="earn">
+              <li><strong>Montepremi unico</strong>: tutte le puntate su una domanda finiscono in un piatto. Chi indovina se lo divide in proporzione a quanto ha puntato.</li>
+              <li>La scritta <strong>"rende x2,5"</strong> accanto a un nome vuol dire che, se vince lui, ogni gettone puntato ne riporta 2,5. Cambia man mano che arrivano altre puntate: meno gente punta su un giocatore, più rende.</li>
+              <li><strong>Podio esatto</strong>: scegli primo, secondo e terzo nell'ordine giusto. È difficile, per questo il piatto del podio va solo a chi ci riesce (se sono in più, se lo dividono).</li>
+              <li>Chi vince il video: chi ha fatto più vittorie nelle partite del video (pari merito = vincono tutti e il piatto si divide).</li>
+            </ul>
+            <h4>Rimborsi</h4>
+            <ul class="earn">
+              <li>Se nessuno indovina, tutti riavete i gettoni puntati.</li>
+              <li>Se punti su qualcuno che nel video non gioca, ti vengono restituiti.</li>
+              <li>Se il risultato non si riesce a leggere entro 7 giorni, quelle puntate vengono rimborsate.</li>
+            </ul>
+            <h4>Stagione</h4>
+            <p>Puoi anche pronosticare chi vince la stagione dell'anno (golf e Sdrogo Corse). Le puntate restano aperte fino alla data indicata e si pagano il 1° gennaio, con la classifica finale del sito.</p>
+            <p class="note small">I gettoni sono gratis, non si comprano e non valgono soldi: servono solo a giocare e a salire nella classifica dei fan.</p>
+          </div>
+        </details>
         <div class="posts" id="club-posts"></div>
       </div>
       <aside class="club-side">
@@ -187,9 +214,9 @@
 <div class="toast" id="toast" role="status" hidden></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
-<script src="data.js?v=20261116a"></script>
-<script src="app.js?v=20261116a"></script>
-<script src="club.js?v=20261116a"></script>
-<script src="theme.js?v=20261116a"></script>
+<script src="data.js?v=20261116b"></script>
+<script src="app.js?v=20261116b"></script>
+<script src="club.js?v=20261116b"></script>
+<script src="theme.js?v=20261116b"></script>
 </body>
 </html>

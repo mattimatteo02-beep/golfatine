@@ -381,3 +381,7 @@ a.strip:hover { border-color: var(--focus); }
 .admin-form > *, .acct > * { min-width: 0; }
 .admin-form input, .admin-form select, .admin-form textarea { max-width: 100%; }
 [hidden] { display: none !important; }
+.how-box { margin-bottom: 16px; }
+.how h4 { margin: 14px 0 6px; font: 700 .95rem/1.2 var(--font-display); text-transform: uppercase; letter-spacing: .03em; }
+.how p { margin: 0 0 6px; color: var(--muted); }
+.how .earn { margin-top: 0; }
