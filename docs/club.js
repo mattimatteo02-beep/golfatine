@@ -317,8 +317,8 @@
       ? `<p class="note small">Nessun pronostico ancora. <a href="#pronostici">Vai ai pronostici</a>.</p>`
       : `<ul class="hist">${bets.map((b) => {
           const mk = b.markets || {};
-          const st = mk.status === "pagato" ? (b.payout > 0 ? `<span class="pos-amt">+${n(b.payout)}</span>` : `<span class="neg-amt">perso</span>`)
-            : mk.status === "annullato" ? "rimborsato" : "in attesa";
+          const st = mk.status === "annullato" ? "rimborsato" : b.payout == null ? "in attesa"
+            : b.payout > 0 ? `<span class="pos-amt">+${n(b.payout)}</span>` : `<span class="neg-amt">perso</span>`;
           const lab = (id) => ((mk.options || []).find((o) => o.id === id) || {}).label || "?";
           const what = b.picks ? "Podio " + b.picks.map((id, i) => `${i + 1}° ${lab(id)}`).join(", ") : (b.options || {}).label || "";
           return `<li><span><strong>${esc(what)}</strong> · ${esc(mk.question || "")}<br><span class="note small">${shortDate(b.created_at)} · puntati ${n(b.amount)}</span></span><span class="hist-amt">${st}</span></li>`;
@@ -362,25 +362,65 @@
     if (!all) q = q.eq("published", true);
     const { data: posts, error } = await q;
     if (error) throw error;
+    // Prima le domande sempre aperte (prossimo video), poi quelle di stagione, poi gli annunci
+    const rank = (p) => Math.min(9, ...(p.markets || []).map((m) => ({ prossimo: 0, stagione: 1 })[m.scope] ?? 2));
+    posts.sort((a, b) => rank(a) - rank(b) || (b.created_at > a.created_at ? 1 : -1));
     const ids = posts.flatMap((p) => p.markets.map((m) => m.id));
+    const rolling = posts.flatMap((p) => p.markets.filter((m) => m.scope === "prossimo").map((m) => m.id));
     const totals = {};
+    const rounds = {};
     let myBets = [];
     if (ids.length) {
       const { data: t } = await sb.from("option_totals").select("*").in("market_id", ids);
       (t || []).forEach((r) => (totals[r.option_id] = r));
+      if (rolling.length) {
+        // Per le domande sempre aperte contano solo i gettoni ancora in gioco
+        const { data: rt } = await sb.from("round_totals").select("*").in("market_id", rolling);
+        (rt || []).forEach((r) => (totals[r.option_id] = r));
+        const { data: mr } = await sb.from("market_rounds").select("*").in("market_id", rolling).order("published_at", { ascending: false }).limit(60);
+        (mr || []).forEach((r) => { if (!rounds[r.market_id]) rounds[r.market_id] = r; });
+      }
       if (state.session) {
         const { data: b } = await sb.from("bets").select("*").eq("user_id", state.session.user.id).in("market_id", ids);
         myBets = b || [];
       }
     }
-    return { posts, totals, myBets };
+    return { posts, totals, myBets, rounds };
   }
 
   function marketStatus(m) {
+    if (m.scope === "prossimo") return { label: "Sempre aperto", open: true };
     if (m.status === "pagato") return { label: "Risultato pubblicato", open: false };
     if (m.status === "annullato") return { label: "Annullata, puntate rimborsate", open: false };
     if (m.status === "chiuso" || new Date(m.closes_at) <= new Date()) return { label: "Puntate chiuse, in attesa del risultato", open: false };
     return { label: `Puntate aperte fino a ${when(m.closes_at)}`, open: true };
+  }
+
+  function stateText(m, st) {
+    if (m.scope === "prossimo") return "Sempre aperto";
+    return st.open ? "Chiude " + when(m.closes_at) : st.label;
+  }
+
+  const GAME_NAMES = { golf: "golfatina", gta: "Sdrogo Corse", uno: "partita a UNO" };
+  const pname = (id) => ((window.GOLFATINE || {}).players || {})[id]?.name || id;
+  let roundsByMarket = {};
+
+  // Domanda sempre aperta: com'è andato l'ultimo video e se ce n'è uno appena uscito
+  function rollingNote(m) {
+    if (m.scope !== "prossimo") return "";
+    const D = window.GOLFATINE || {};
+    const parts = [];
+    const week = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
+    const fresh = (D.pending || []).filter((v) => v.game === m.game && v.date >= week).sort((a, b) => (a.date < b.date ? 1 : -1))[0];
+    if (fresh) parts.push(`<strong>Nuovo video uscito il ${esc(fresh.date.split("-").reverse().join("/"))}</strong>: le puntate fatte prima dell'uscita aspettano il risultato, quelle di adesso valgono per il video dopo.`);
+    else parts.push(`Valgono le puntate fatte prima che esca il prossimo video. Si paga da solo appena c'è il risultato.`);
+    const r = roundsByMarket[m.id];
+    if (r) {
+      const who = (r.result || []).map(pname);
+      const res = r.outcome === "rimborsato" ? "puntate rimborsate" : m.kind === "podio" ? (who.length ? "podio " + who.map((x, i) => `${i + 1}° ${esc(x)}`).join(", ") : "podio non chiaro, rimborsato") : "ha vinto " + who.map(esc).join(" e ");
+      parts.push(`Ultima ${esc(GAME_NAMES[m.game] || "partita")}: ${res}${r.pool ? ` (${n(r.pool)} gettoni in palio)` : ""}.`);
+    }
+    return `<p class="note small rolling">${parts.join(" ")}</p>`;
   }
 
   const picked = {}; // domanda -> opzione scelta
@@ -396,7 +436,7 @@
     const bettors = opts.reduce((s, o) => s + Number((totals[o.id] || {}).bettors || 0), 0);
     const st = marketStatus(m);
     const open = st.open && canBet;
-    const mine = myBets.filter((b) => b.market_id === m.id);
+    const mine = myBets.filter((b) => b.market_id === m.id && (m.scope !== "prossimo" || b.payout == null));
     const chosen = podPicks[m.id] || [];
     const real = m.status === "pagato" && m.podium ? m.podium : null;
     const rows = opts.map((o) => {
@@ -411,7 +451,8 @@
     const myList = mine.map((b) => `<li>${(b.picks || []).map((id, i) => `${i + 1}° ${esc(label(id))}`).join(" · ")} — ${n(b.amount)} gettoni${b.payout != null ? (b.payout > 0 ? ` <span class="pos-amt">vinti ${n(b.payout)}</span>` : m.status === "annullato" ? " (rimborsati)" : " (perso)") : ""}</li>`).join("");
     const next = ["primo", "secondo", "terzo"][chosen.length];
     return `<div class="market podium" data-market-id="${m.id}">
-      <div class="market-head"><h4>${esc(m.question)}</h4><span class="market-state ${st.open ? "is-open" : ""}">${st.open ? "Chiude " + when(m.closes_at) : st.label}</span></div>
+      <div class="market-head"><h4>${esc(m.question)}</h4><span class="market-state ${st.open ? "is-open" : ""}">${stateText(m, st)}</span></div>
+      ${rollingNote(m)}
       ${open ? `<p class="note small">${chosen.length < 3 ? `1. Tocca chi arriva <strong>${next}</strong>` : "Podio scelto: tocca un nome per cambiarlo"}. Vinci solo se indovini l'ordine esatto, per questo rende molto di più.</p>` : ""}
       <ol class="opts">${rows}</ol>
       ${open ? `<div class="bet-box" ${chosen.length === 3 ? "" : "hidden"}>
@@ -437,7 +478,7 @@
     const pool = opts.reduce((s, o) => s + Number((totals[o.id] || {}).total || 0), 0);
     const st = marketStatus(m);
     const open = st.open && canBet;
-    const mine = myBets.filter((b) => b.market_id === m.id);
+    const mine = myBets.filter((b) => b.market_id === m.id && (m.scope !== "prossimo" || b.payout == null));
     const rows = opts.map((o) => {
       const t = Number((totals[o.id] || {}).total || 0);
       const share = pool ? Math.round((100 * t) / pool) : 0;
@@ -457,7 +498,8 @@
       ? `<p class="note">Hai puntato ${n(mine.reduce((s, b) => s + Number(b.amount), 0))} e ricevuto ${n(paid.reduce((s, b) => s + Number(b.payout), 0))} gettoni.</p>` : "";
     const selLabel = picked[m.id] ? (opts.find((o) => o.id === picked[m.id]) || {}).label : null;
     return `<div class="market" data-market-id="${m.id}">
-      <div class="market-head"><h4>${esc(m.question)}</h4><span class="market-state ${st.open ? "is-open" : ""}">${st.open ? "Chiude " + when(m.closes_at) : st.label}</span></div>
+      <div class="market-head"><h4>${esc(m.question)}</h4><span class="market-state ${st.open ? "is-open" : ""}">${stateText(m, st)}</span></div>
+      ${rollingNote(m)}
       ${open ? `<p class="note small">1. Tocca chi secondo te vince</p>` : ""}
       <ol class="opts">${rows}</ol>
       ${open ? `<div class="bet-box" ${selLabel ? "" : "hidden"} id="betbox-${m.id}">
@@ -481,7 +523,7 @@
       <div class="top">${p.game ? `<span class="chip">${esc(p.game)}</span>` : "<span></span>"}<span class="date">${when(p.created_at)}</span></div>
       ${p.image_url ? `<img class="post-thumb" src="${esc(p.image_url)}" alt="Miniatura del video" loading="lazy">` : ""}
       <h3>${esc(p.title)}</h3>
-      ${p.body ? `<p>${esc(p.body)}</p>` : ""}
+      ${p.body && !(p.markets || []).some((m) => m.scope === "prossimo") ? `<p>${esc(p.body)}</p>` : ""}
       ${p.video_url ? `<a class="yt" href="${esc(p.video_url)}" target="_blank" rel="noopener">Guarda il video ↗</a>` : ""}
       ${(p.markets || []).slice().sort((a, b) => a.id - b.id).map((m) => marketHtml(m, totals, myBets, canBet)).join("")}
     </article>`;
@@ -500,7 +542,8 @@
     loadFanCounts();
     if (!sb) { list.innerHTML = ""; lb.innerHTML = ""; return; }
     try {
-      const { posts, totals, myBets } = await loadPosts();
+      const { posts, totals, myBets, rounds } = await loadPosts();
+      roundsByMarket = rounds || {};
       const canBet = Boolean(state.profile && state.profile.username);
       list.innerHTML = posts.length
         ? posts.map((p) => postHtml(p, totals, myBets, canBet)).join("")

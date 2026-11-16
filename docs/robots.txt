@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /admin.html
+Sitemap: https://mattimatteo02-beep.github.io/golfatine/sitemap.xml

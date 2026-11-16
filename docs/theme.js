@@ -1,17 +1,12 @@
-// Cookie consent + ad slots. Ads load only with consent and only once config.adsenseClient is set.
+// Banner pubblicitari (Google AdSense). Si attivano solo quando config.adsenseClient è impostato.
+// Il consenso ai cookie in Europa lo chiede il messaggio di Google (AdSense → Privacy e messaggi),
+// che arriva insieme allo script degli annunci: il sito da solo usa solo l'archivio tecnico del login.
 (() => {
-  const KEY = "umc-consent";
   const cfg = window.GOLFATINE_CONFIG || {};
-  const box = document.getElementById("cookie");
-  const opt = box.querySelector(".cookie-opt");
-  const adsBox = document.getElementById("cookie-ads");
+  const prefs = document.getElementById("cookie-open");
   const preview = new URLSearchParams(location.search).has("anteprima");
 
-  const read = () => { try { return JSON.parse(localStorage.getItem(KEY)); } catch { return null; } };
-  const save = (ads) => { try { localStorage.setItem(KEY, JSON.stringify({ ads, date: new Date().toISOString() })); } catch {} };
-
-  function loadAds() {
-    if (!cfg.adsenseClient || document.getElementById("adsense")) return;
+  if (cfg.adsenseClient) {
     const s = document.createElement("script");
     s.id = "adsense"; s.async = true; s.crossOrigin = "anonymous";
     s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + encodeURIComponent(cfg.adsenseClient);
@@ -22,30 +17,15 @@
       el.firstChild.dataset.adClient = cfg.adsenseClient;
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     });
+    // "Preferenze cookie" riapre il messaggio di consenso di Google
+    if (prefs) prefs.addEventListener("click", () => {
+      window.googlefc = window.googlefc || {};
+      (window.googlefc.callbackQueue = window.googlefc.callbackQueue || []).push(() => window.googlefc.showRevocationMessage && window.googlefc.showRevocationMessage());
+    });
+  } else if (prefs) {
+    // Senza pubblicità non c'è niente da scegliere: il link sparisce
+    if (prefs.previousSibling && prefs.previousSibling.nodeType === 3) prefs.previousSibling.remove();
+    prefs.remove();
   }
-
-  function apply() {
-    const c = read();
-    if (c && c.ads) loadAds();
-    if (preview) document.querySelectorAll(".ad-slot").forEach((el) => (el.hidden = false));
-  }
-
-  function open() {
-    box.hidden = false; opt.hidden = true;
-    box.querySelector('[data-c="custom"]').textContent = "Personalizza";
-    adsBox.checked = !!(read() || {}).ads;
-  }
-
-  box.addEventListener("click", (e) => {
-    const b = e.target.closest("button[data-c]");
-    if (!b) return;
-    const c = b.dataset.c;
-    if (c === "custom" && opt.hidden) { opt.hidden = false; b.textContent = "Salva scelta"; return; }
-    save(c === "yes" ? true : c === "no" ? false : adsBox.checked);
-    box.hidden = true; apply();
-  });
-  document.getElementById("cookie-open").addEventListener("click", open);
-
-  if (!read()) open();
-  apply();
+  if (preview) document.querySelectorAll(".ad-slot").forEach((el) => (el.hidden = false));
 })();
