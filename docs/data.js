@@ -15492,7 +15492,23 @@ window.GOLFATINE = {
    "note": "risultato non disponibile"
   }
  ],
- "pending": [],
+ "pending": [
+  {
+   "id": "MWyLk3R5Wjk",
+   "date": "2026-11-15",
+   "season": 2026,
+   "game": "uno",
+   "channel": "GaBBoDSQ",
+   "title": "GIOCHIAMO A UNO CRIMINALE ( NUOVO GIOCO FOLLE ) con Delux Rohn e Mollu",
+   "url": "https://www.youtube.com/watch?v=MWyLk3R5Wjk",
+   "players": [
+    "gabbo",
+    "rohn",
+    "delux",
+    "mollu"
+   ]
+  }
+ ],
  "maps": {
   "A Little Adventure": [
    1,
