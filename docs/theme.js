@@ -13,6 +13,7 @@
     document.head.appendChild(s);
     document.querySelectorAll(".ad-slot").forEach((el) => {
       el.hidden = false;
+      el.classList.add("live");
       el.innerHTML = '<ins class="adsbygoogle" style="display:block" data-ad-format="auto" data-full-width-responsive="true"></ins>';
       el.firstChild.dataset.adClient = cfg.adsenseClient;
       (window.adsbygoogle = window.adsbygoogle || []).push({});

@@ -9,5 +9,5 @@ window.GOLFATINE_CONFIG = {
   siteDomain: "umc-melagodo.com",
   // ID editore AdSense (es. "ca-pub-1234567890123456"). Quando è impostato si attivano i banner
   // e build_data.py crea docs/ads.txt. Il consenso in Europa lo chiede il messaggio di Google (Privacy e messaggi).
-  adsenseClient: "",
+  adsenseClient: "ca-pub-6410464030440942",
 };
