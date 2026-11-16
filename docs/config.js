@@ -6,7 +6,7 @@ window.GOLFATINE_CONFIG = {
   supabaseAnonKey: "sb_publishable_klheITUS01XZGu3sVcSK9w_43hHHIll",
   // Dominio del sito (es. "umc-melagodo.com"). Quando è impostato, build_data.py crea docs/CNAME,
   // robots.txt e sitemap.xml con questo indirizzo. Lascialo vuoto finché il dominio non punta a GitHub Pages.
-  siteDomain: "",
+  siteDomain: "umc-melagodo.com",
   // ID editore AdSense (es. "ca-pub-1234567890123456"). Quando è impostato si attivano i banner
   // e build_data.py crea docs/ads.txt. Il consenso in Europa lo chiede il messaggio di Google (Privacy e messaggi).
   adsenseClient: "",
