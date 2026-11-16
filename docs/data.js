@@ -1,7 +1,7 @@
 // File generato da scripts/build_data.py: non modificarlo a mano.
 window.GOLFATINE = {
- "updated": "2026-11-13",
- "lastMatch": "2026-11-12",
+ "updated": "2026-11-16",
+ "lastMatch": "2026-11-16",
  "players": {
   "dread": {
    "name": "Dread",
@@ -134,6 +134,104 @@ window.GOLFATINE = {
   }
  ],
  "matches": [
+  {
+   "id": "3NAXV8HOZIM",
+   "date": "2026-11-16",
+   "season": 2026,
+   "game": "golf",
+   "channel": "oessaM",
+   "title": "GHSBR GOLFATINA SPAZIALE🪐⛳con @GaBBoDSQ @JustRoHn7 @Mollu @oDeluxx",
+   "url": "https://www.youtube.com/watch?v=3NAXV8HOZIM",
+   "map": "More Space For Friends Crazeee Edition",
+   "par": 58,
+   "results": [
+    {
+     "p": "mollu",
+     "pos": 1,
+     "strokes": 51,
+     "hio": 5,
+     "toPar": -7
+    },
+    {
+     "p": "rohn",
+     "pos": 2,
+     "strokes": 56,
+     "hio": 1,
+     "toPar": -2
+    },
+    {
+     "p": "delux",
+     "pos": 3,
+     "strokes": 60,
+     "hio": 4,
+     "toPar": 2
+    },
+    {
+     "p": "gabbo",
+     "pos": 4,
+     "strokes": 68,
+     "hio": 2,
+     "toPar": 10
+    },
+    {
+     "p": "masseo",
+     "pos": 5,
+     "strokes": 79,
+     "hio": 1,
+     "toPar": 21
+    }
+   ],
+   "note": "tabellone finale letto dal video"
+  },
+  {
+   "id": "_2ScgmWE2WY",
+   "date": "2026-11-13",
+   "season": 2026,
+   "game": "golf",
+   "channel": "JTaz Extra",
+   "title": "L'ULTIMA GOLFATINA PRIMA DI GTA 6 ⛳️ con DREAD, DELUX, GABBO, MOLLU, JTAZ",
+   "url": "https://www.youtube.com/watch?v=_2ScgmWE2WY",
+   "map": "Mehdis Black Fortress Of Secrets",
+   "par": 62,
+   "results": [
+    {
+     "p": "mollu",
+     "pos": 1,
+     "strokes": 67,
+     "hio": 3,
+     "toPar": 5
+    },
+    {
+     "p": "delux",
+     "pos": 2,
+     "strokes": 87,
+     "hio": 3,
+     "toPar": 25
+    },
+    {
+     "p": "dread",
+     "pos": 3,
+     "strokes": 88,
+     "hio": 2,
+     "toPar": 26
+    },
+    {
+     "p": "jtaz",
+     "pos": 4,
+     "strokes": 94,
+     "hio": 3,
+     "toPar": 32
+    },
+    {
+     "p": "gabbo",
+     "pos": 5,
+     "strokes": 106,
+     "hio": 0,
+     "toPar": 44
+    }
+   ],
+   "note": "tabellone finale letto dal video"
+  },
   {
    "id": "PKGntade0T0",
    "date": "2026-11-12",
@@ -15394,24 +15492,7 @@ window.GOLFATINE = {
    "note": "risultato non disponibile"
   }
  ],
- "pending": [
-  {
-   "id": "_2ScgmWE2WY",
-   "date": "2026-11-13",
-   "season": 2026,
-   "game": "golf",
-   "channel": "JTaz Extra",
-   "title": "L'ULTIMA GOLFATINA PRIMA DI GTA 6 ⛳️ con DREAD, DELUX, GABBO, MOLLU, JTAZ",
-   "url": "https://www.youtube.com/watch?v=_2ScgmWE2WY",
-   "players": [
-    "delux",
-    "gabbo",
-    "dread",
-    "mollu",
-    "jtaz"
-   ]
-  }
- ],
+ "pending": [],
  "maps": {
   "A Little Adventure": [
    1,
@@ -16378,6 +16459,26 @@ window.GOLFATINE = {
    3,
    5
   ],
+  "Mehdis Black Fortress Of Secrets": [
+   2,
+   4,
+   3,
+   4,
+   5,
+   4,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   5,
+   4,
+   6,
+   6,
+   5,
+   8
+  ],
   "Midnight Manor": [
    2,
    3,
@@ -16437,6 +16538,26 @@ window.GOLFATINE = {
    3,
    3,
    1
+  ],
+  "More Space For Friends Crazeee Edition": [
+   1,
+   2,
+   2,
+   3,
+   3,
+   4,
+   2,
+   4,
+   3,
+   3,
+   4,
+   3,
+   3,
+   5,
+   5,
+   4,
+   3,
+   4
   ],
   "Mushroom Valley": [
    2,
