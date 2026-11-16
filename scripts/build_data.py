@@ -280,5 +280,29 @@ def main():
     print(f"{len(matches)} partite, {len(unreadable)} senza risultato -> {OUT.relative_to(ROOT)}")
 
 
+def site_files():
+    """CNAME, ads.txt, robots.txt e sitemap.xml a partire da docs/config.js (dominio e AdSense)."""
+    docs = ROOT / "docs"
+    cfg = (docs / "config.js").read_text(encoding="utf-8")
+    get = lambda k: (re.search(k + r':\s*"([^"]*)"', cfg) or [None, ""])[1].strip()  # noqa: E731
+    domain = get("siteDomain").removeprefix("https://").removeprefix("http://").strip("/")
+    client = get("adsenseClient")
+    base = f"https://{domain}/" if domain else "https://mattimatteo02-beep.github.io/golfatine/"
+    files = {
+        "CNAME": domain + "\n" if domain else None,
+        "ads.txt": f"google.com, {client.removeprefix('ca-')}, DIRECT, f08c47fec0942fa0\n" if client.startswith("ca-pub-") else None,
+        "robots.txt": f"User-agent: *\nDisallow: /admin.html\nSitemap: {base}sitemap.xml\n",
+        "sitemap.xml": ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+                        f"  <url><loc>{base}</loc></url>\n  <url><loc>{base}cookie.html</loc></url>\n</urlset>\n"),
+    }
+    for name, content in files.items():
+        f = docs / name
+        if content is None:
+            f.unlink(missing_ok=True)
+        elif not f.exists() or f.read_text(encoding="utf-8") != content:
+            f.write_text(content, encoding="utf-8")
+
+
 if __name__ == "__main__":
+    site_files()
     main()

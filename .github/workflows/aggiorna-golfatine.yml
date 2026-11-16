@@ -1,5 +1,5 @@
 # Ogni ora controlla i canali del gruppo e i risultati inseriti dal pannello admin:
-# se c'è qualcosa di nuovo rigenera i dati del sito e li pubblica.
+# se c'è qualcosa di nuovo rigenera i dati del sito e li pubblica, e paga i pronostici dei video usciti.
 name: Aggiorna golfatine
 
 on:
@@ -29,11 +29,16 @@ jobs:
         run: python3 scripts/check_new_videos.py
       - name: Rigenera i dati del sito (foglio + risultati dal pannello admin)
         run: python3 scripts/build_data.py
+      - name: Paga i pronostici (serve il secret SUPABASE_SECRET_KEY)
+        continue-on-error: true
+        env:
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python3 scripts/settle_bets.py
       - name: Pubblica
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git add data/golfatine.xlsx docs/data.js
+          git add -A data/golfatine.xlsx data/published.json docs/
           if git diff --cached --quiet; then echo "Niente di nuovo"; exit 0; fi
           git config user.name "golfatine-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

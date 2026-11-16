@@ -25,7 +25,7 @@
   $("f-players").innerHTML = core.map((p) => `<label class="check"><input type="checkbox" value="${esc(p)}" checked> ${esc(pname(p))}</label>`).join("");
   function closeNote() {
     const d = $("f-day").value, t = $("f-time").value;
-    $("f-close-note").textContent = d && t ? `Le puntate si chiudono da sole ${when(romeToISO(d, t))}, quando esce il video.` : "";
+    $("f-close-note").textContent = d && t ? `Le puntate si chiudono da sole ${when(romeToISO(d, t))}. Il risultato di questa domanda lo indichi tu qui sotto, in Gestione.` : "";
   }
   ["f-day", "f-time"].forEach((id) => $(id).addEventListener("input", closeNote));
   closeNote();
@@ -63,7 +63,7 @@
     const players = [...$("f-players").querySelectorAll("input:checked")].map((i) => pname(i.value))
       .concat($("f-extra").value.split(",").map((s) => s.trim()).filter(Boolean));
     const closes = romeToISO($("f-day").value, $("f-time").value);
-    if (new Date(closes) <= new Date()) { msg.textContent = "L'uscita del video è già passata: scegli una data futura."; return; }
+    if (new Date(closes) <= new Date()) { msg.textContent = "La scadenza è già passata: scegli una data futura."; return; }
     const markets = [];
     if ($("k-winner").checked) markets.push({ question: "Chi vince la golfatina?", kind: "vincitore", options: players });
     if ($("k-podium").checked) markets.push({ question: "Indovina il podio: primo, secondo e terzo", kind: "podio", options: players });
@@ -116,19 +116,24 @@
       <div class="top"><span class="chip">${p.published ? "Pubblicato" : "Bozza"}</span><span class="date">${when(p.created_at)}</span></div>
       ${p.image_url ? `<img class="post-thumb" src="${esc(p.image_url)}" alt="" loading="lazy">` : ""}
       <h3>${esc(p.title)}</h3>
-      <div class="row">
+      ${(p.markets || []).some((m) => m.scope === "prossimo") ? "" : `<div class="row">
         <label class="sr" for="v-${p.id}">Link al video</label>
         <input id="v-${p.id}" type="url" value="${esc(p.video_url || "")}" placeholder="Link al video, quando esce">
         <button class="btn ghost small" type="button" data-act="video" data-id="${p.id}">Salva link</button>
         <button class="btn ghost small" type="button" data-act="publish" data-id="${p.id}" data-val="${!p.published}">${p.published ? "Nascondi" : "Pubblica"}</button>
         <button class="btn danger small" type="button" data-act="delete" data-id="${p.id}">Elimina</button>
-      </div>
+      </div>`}
       ${(p.markets || []).slice().sort((a, b) => a.id - b.id).map((m) => marketAdmin(m, totals)).join("")}
       <p class="msg" role="status" id="pmsg-${p.id}"></p>
     </article>`).join("");
   }
 
   function marketAdmin(m, totals) {
+    if (m.scope === "prossimo") {
+      const pool = (m.options || []).reduce((s, o) => s + Number((totals[o.id] || {}).total || 0), 0);
+      return `<div class="market"><div class="market-head"><h4>${esc(m.question)}</h4><span class="market-state is-open">Automatica</span></div>
+        <p class="note small">Sempre aperta, si paga da sola a ogni video. In gioco adesso: ${n(pool)} gettoni.</p></div>`;
+    }
     const opts = (m.options || []).slice().sort((a, b) => a.sort - b.sort || a.id - b.id);
     const pool = opts.reduce((s, o) => s + Number((totals[o.id] || {}).total || 0), 0);
     const bettors = opts.reduce((s, o) => s + Number((totals[o.id] || {}).bettors || 0), 0);

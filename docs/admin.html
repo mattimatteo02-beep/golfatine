@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20261116a">
 </head>
 <body>
 <header class="topbar">
@@ -26,20 +26,20 @@
 <main class="wrap">
   <section class="section">
     <h1 class="h2">Pannello admin</h1>
-    <p class="note">Qui si annunciano le prossime golfatine con la miniatura del video, e i fan pronosticano chi vince o il podio. Le puntate si chiudono da sole all'ora di uscita del video; quando è uscito, indica il risultato e i gettoni vengono pagati in automatico.</p>
+    <p class="note">I pronostici sul prossimo video (golf, Sdrogo Corse e UNO) sono sempre aperti e vanno da soli: quando esce un video il sito lo trova, e appena c'è il risultato paga le puntate fatte prima dell'uscita. Qui puoi inserire i risultati che il sito non legge da solo e, se vuoi, aggiungere una domanda speciale con la sua scadenza.</p>
     <div id="club-account"></div>
     <p class="msg" id="gate"></p>
   </section>
 
   <div id="admin" hidden>
     <section id="nuovo" class="section">
-      <h2 class="h2">Nuovo annuncio</h2>
+      <h2 class="h2">Domanda speciale (facoltativa)</h2>
       <form class="acct admin-form" id="post-form">
-        <label class="field"><span>Titolo</span><input id="f-title" required minlength="3" maxlength="140" placeholder="Domani la golfatina: chi la spunta?"></label>
+        <label class="field"><span>Titolo</span><input id="f-title" required minlength="3" maxlength="140" placeholder="Torneo di Natale: chi la spunta?"></label>
         <div class="field-row">
           <label class="field"><span>Gioco</span>
             <select id="f-game"><option>Golf With Your Friends</option><option>Super Battle Golf</option><option>UNO</option><option>Trackmania</option><option>GTA V Online</option><option>Altro</option></select></label>
-          <label class="field"><span>Il video esce il</span><input id="f-day" type="date" required></label>
+          <label class="field"><span>Puntate aperte fino al</span><input id="f-day" type="date" required></label>
           <label class="field"><span>Alle (ora italiana)</span><input id="f-time" type="time" required value="10:00"></label>
         </div>
         <p class="note small" id="f-close-note"></p>
@@ -114,8 +114,8 @@
 <div class="toast" id="toast" role="status" hidden></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
-<script src="data.js"></script>
-<script src="club.js"></script>
-<script src="admin.js"></script>
+<script src="data.js?v=20261116a"></script>
+<script src="club.js?v=20261116a"></script>
+<script src="admin.js?v=20261116a"></script>
 </body>
 </html>

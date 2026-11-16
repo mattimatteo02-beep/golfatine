@@ -3,13 +3,29 @@
 Il sito resta statico (GitHub Pages). Login, gettoni, post e puntate stanno su Supabase, che ha un piano gratuito.
 
 1. Crea un account su https://supabase.com e un nuovo progetto (regione Europa, es. Frankfurt).
-2. Apri **SQL Editor**, incolla tutto `supabase/schema.sql` e premi **Run**. Poi fai lo stesso, in ordine, con `supabase/002_nomi_e_avatar.sql` (nome utente e avatar alla registrazione) `supabase/003_tifosi.sql` (quanti fan tifano ogni giocatore) e `supabase/004_annunci_podio_risultati.sql` (miniature, podio, gestione admin, risultati dal pannello).
+2. Apri **SQL Editor**, incolla tutto `supabase/schema.sql` e premi **Run**. Poi fai lo stesso, in ordine, con `supabase/002_nomi_e_avatar.sql` (nome utente e avatar alla registrazione) `supabase/003_tifosi.sql` (quanti fan tifano ogni giocatore) `supabase/004_annunci_podio_risultati.sql` (miniature, podio, gestione admin, risultati dal pannello) e `supabase/005_pronostici_sempre_aperti.sql` (pronostici sempre aperti sul prossimo video e di stagione).
 3. In **Authentication → URL Configuration** metti come *Site URL* l'indirizzo del sito
    (es. `https://mattimatteo02-beep.github.io/golfatine/`) e aggiungilo anche tra i *Redirect URLs*.
 4. In **Project Settings → API** copia *Project URL* e la chiave *anon public* dentro `docs/config.js`.
 5. Registrati sul sito con la tua email, scegli il nome utente, poi nel SQL Editor rendi admin il tuo account:
    `update public.profiles set is_admin = true where username = 'TUO_NOME';`
 6. Il pannello admin è su `admin.html` (il link compare accanto al tuo nome quando sei admin). Da lì puoi anche nominare altri admin, per esempio Melagodo o i moderatori, una volta che si sono registrati.
+
+## Pagamento automatico dei pronostici
+
+Il robot del sito (GitHub Actions, `scripts/settle_bets.py`) paga da solo le domande "prossimo video" e quelle di stagione.
+Gli serve la chiave segreta di Supabase: **Project Settings → API Keys → Secret keys** → copia la chiave, poi su GitHub
+**Settings → Secrets and variables → Actions → New repository secret**, nome `SUPABASE_SECRET_KEY`. Non va mai messa nel codice.
+
+Come paga: per ogni gioco (golf, Sdrogo Corse, UNO) c'è una domanda che non chiude mai. Quando il sito trova un nuovo
+video, contano solo le puntate fatte prima dell'ora di uscita su YouTube; quelle fatte dopo restano per il video successivo.
+Appena il video ha il risultato il piatto viene diviso; se il risultato non arriva entro 7 giorni (o il video è
+segnato senza risultato leggibile) quelle puntate vengono rimborsate. Le domande di stagione si pagano dal 1° gennaio.
+
+## Dominio proprio
+
+Dopo aver collegato il dominio a GitHub Pages, aggiungi il nuovo indirizzo in **Authentication → URL Configuration**
+(Site URL e Redirect URLs), altrimenti i link di accesso via email riportano al vecchio indirizzo.
 
 ## Conferma dell'email
 

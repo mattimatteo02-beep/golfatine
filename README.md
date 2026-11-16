@@ -34,3 +34,12 @@ UNO conta solo il vincitore del video. Ospiti esclusi dalle classifiche. GTA esc
 **Actions → Aggiorna golfatine → Run workflow**. Legge i feed RSS dei canali del gruppo (`scripts/check_new_videos.py`):
 ogni nuovo video con "golf" nel titolo entra nel foglio come "in arrivo", il sito lo mostra subito in "Ultima golfatina"
 e lo pubblica. Il risultato (foglio Golf) si aggiunge poi a mano; la nota "aggiunta in automatico" va tolta quando c'è.
+Salva anche l'ora esatta di uscita di ogni video (`data/published.json`) e poi paga i pronostici (`scripts/settle_bets.py`,
+serve il secret `SUPABASE_SECRET_KEY`, vedi `supabase/README.md`).
+
+## Dominio e pubblicità
+
+In `docs/config.js` ci sono `siteDomain` e `adsenseClient`. Quando si compilano, `scripts/build_data.py` crea
+`docs/CNAME`, `docs/ads.txt`, `robots.txt` e `sitemap.xml`, e il sito mostra i banner AdSense. Il consenso ai cookie
+in Europa lo gestisce il messaggio di Google (AdSense → Privacy e messaggi → Regolamenti europei), da attivare una volta.
+Metti `siteDomain` solo quando il dominio punta già a GitHub Pages, altrimenti il sito smette di aprirsi.

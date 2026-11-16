@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Controlla i canali YouTube del gruppo e aggiunge al foglio le nuove golfatine.
+"""Controlla i canali YouTube del gruppo e aggiunge al foglio i nuovi video (golf, Sdrogo Corse, UNO).
 
 Uso:  python3 scripts/check_new_videos.py
 Esce con codice 0 e scrive "nuovi=N" su stdout (e in $GITHUB_OUTPUT, se c'è).
@@ -14,6 +14,7 @@ import pathlib
 import re
 import sys
 import urllib.request
+import json
 import xml.etree.ElementTree as ET
 
 import openpyxl
@@ -21,6 +22,20 @@ import openpyxl
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 XLSX = ROOT / "data" / "golfatine.xlsx"
 PENDING_NOTE = "aggiunta in automatico"
+PUBLISHED = ROOT / "data" / "published.json"  # ora esatta di uscita di ogni video (serve ai pronostici)
+
+
+def game_of(title):
+    """Che gioco è, dal titolo. None se non è un video del campionato."""
+    if re.search(r"battle\s*golf", title, re.I):
+        return "Super Battle Golf"
+    if re.search(r"golf", title, re.I):
+        return "Golf With Your Friends"
+    if re.search(r"sdrogo\s*corse|ghsbr\s*corse", title, re.I):
+        return "GTA V Online"
+    if re.search(r"\bUNO\b", title):  # maiuscolo: evita "uno" come numero
+        return "UNO"
+    return None
 
 # Canali dove escono le golfatine (nome come nel foglio -> id del canale)
 CHANNELS = {
@@ -68,6 +83,8 @@ def main():
     # Solo video recenti: quelli vecchi rimasti fuori dal foglio sono stati esclusi apposta
     since = (datetime.date.today() - datetime.timedelta(days=10)).isoformat()
 
+    published = json.loads(PUBLISHED.read_text(encoding="utf-8")) if PUBLISHED.exists() else {}
+    published_before = dict(published)
     added, failed = [], []
     for channel, cid in CHANNELS.items():
         try:
@@ -77,9 +94,13 @@ def main():
             continue
         for v in videos:
             t = v["title"]
-            if v["short"] or v["id"] in known or v["published"][:10] < since or not re.search(r"golf", t, re.I):
+            game = game_of(t)
+            if v["short"] or not game:
                 continue
-            game = "Super Battle Golf" if re.search(r"battle\s*golf", t, re.I) else "Golf With Your Friends"
+            if v["published"]:
+                published[v["id"]] = v["published"]
+            if v["id"] in known or v["published"][:10] < since:
+                continue
             players = [p for p, rx in NAMES.items() if re.search(rx, t, re.I)]
             if OWNER[channel] not in players:
                 players.insert(0, OWNER[channel])
@@ -97,6 +118,8 @@ def main():
 
     if added:
         wb.save(XLSX)
+    if published != published_before:
+        PUBLISHED.write_text(json.dumps(dict(sorted(published.items())), indent=1) + "\n", encoding="utf-8")
     for a in added:
         print("nuovo:", a)
     for f in failed:
