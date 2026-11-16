@@ -568,6 +568,8 @@
 
   // Scelta dell'opzione, importo e puntata
   document.addEventListener("click", async (e) => {
+    const how = e.target.closest("[data-open-how]");
+    if (how) { e.preventDefault(); const d = document.getElementById("come-funziona"); if (d) { d.open = true; d.scrollIntoView({ behavior: "smooth", block: "start" }); } return; }
     const pp = e.target.closest("[data-podpick]");
     if (pp) {
       const mid = pp.dataset.market, id = Number(pp.dataset.podpick);
