@@ -73,6 +73,8 @@ body[data-game="golf"] .fx-golf, body[data-game="uno"] .fx-uno, body[data-game="
 /* Spazi pubblicitari: visibili solo con un circuito configurato e il consenso */
 .ad-slot { display: grid; place-items: center; min-height: 90px; margin: 16px 0; border: 1px dashed var(--line); border-radius: 8px; background: var(--chip); color: var(--muted); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; }
 .ad-slot[hidden] { display: none; }
+.ad-slot.live { display: block; min-height: 0; border: 0; background: none; }
+.ad-slot ins[data-ad-status="unfilled"] { display: none !important; }
 
 /* Banner cookie */
 .cookie { position: fixed; z-index: 50; left: 16px; right: 16px; bottom: 16px; max-width: 640px; margin-inline: auto; padding: 16px 18px; border-radius: 12px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); box-shadow: 0 12px 40px rgb(0 0 0 / .25); }
