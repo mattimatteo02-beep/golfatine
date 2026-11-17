@@ -385,3 +385,23 @@ a.strip:hover { border-color: var(--focus); }
 .how h4 { margin: 14px 0 6px; font: 700 .95rem/1.2 var(--font-display); text-transform: uppercase; letter-spacing: .03em; }
 .how p { margin: 0 0 6px; color: var(--muted); }
 .how .earn { margin-top: 0; }
+
+/* Pronostici: riquadri a scomparsa e pulsanti compatti */
+details.post { display: block; padding: 0; }
+.post-sum { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+.post-sum::-webkit-details-marker { display: none; }
+.post-sum-text { display: grid; gap: 4px; min-width: 0; flex: 1; justify-items: start; }
+.post-sum h3 { font-size: 1.2rem; }
+.post-meta { font-size: .82rem; color: var(--muted); }
+.post-chev { flex: none; width: 10px; height: 10px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .2s; margin-right: 4px; }
+details.post[open] .post-chev { transform: rotate(-135deg); }
+.post-body { display: grid; gap: 10px; padding: 0 16px 16px; min-width: 0; }
+.opts { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px; }
+.opt { padding: 7px 9px; font-size: .92rem; gap: 6px; }
+.opt-label { display: grid; gap: 1px; }
+.opt .mine { display: block; font-size: .72rem; }
+.opt-num { font-size: .78rem; }
+.market h4 { font-size: 1rem; }
+.market .note.small { font-size: .8rem; }
+.bet-box { padding: 10px; }
+.bet-box .row .btn.small { padding: 6px 10px; }
