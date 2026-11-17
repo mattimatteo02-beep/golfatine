@@ -412,7 +412,8 @@
     const parts = [];
     const week = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
     const fresh = (D.pending || []).filter((v) => v.game === m.game && v.date >= week).sort((a, b) => (a.date < b.date ? 1 : -1))[0];
-    if (fresh) parts.push(`<strong>Nuovo video uscito il ${esc(fresh.date.split("-").reverse().join("/"))}</strong>: le puntate fatte prima dell'uscita aspettano il risultato, quelle di adesso valgono per il video dopo.`);
+    if (m.kind === "podio") { /* la spiegazione sta già nella domanda sopra */ }
+    else if (fresh) parts.push(`<strong>Nuovo video uscito il ${esc(fresh.date.split("-").reverse().join("/"))}</strong>: le puntate fatte prima dell'uscita aspettano il risultato, quelle di adesso valgono per il video dopo.`);
     else parts.push(`Valgono le puntate fatte prima che esca il prossimo video. Si paga da solo appena c'è il risultato.`);
     const r = roundsByMarket[m.id];
     if (r) {
@@ -487,7 +488,7 @@
       const myOn = mine.filter((b) => b.option_id === o.id).reduce((s, b) => s + Number(b.amount), 0);
       const sel = picked[m.id] === o.id;
       const inner = `<span class="opt-bar" style="width:${share}%"></span>
-        <span class="opt-label">${esc(o.label)}${win ? " · ha vinto" : ""}${myOn ? ` <span class="mine">hai puntato ${n(myOn)}</span>` : ""}</span>
+        <span class="opt-label">${esc(o.label)}${win ? " · ha vinto" : ""}${myOn ? `<span class="mine">hai puntato ${n(myOn)}</span>` : ""}</span>
         <span class="opt-num num" title="Ogni gettone puntato ne rende tanti così se vince">${quota ? "rende x" + quota.toLocaleString("it-IT", { maximumFractionDigits: 1 }) : ""}</span>`;
       return open
         ? `<li><button type="button" class="opt pick ${sel ? "chosen" : ""}" data-pick="${o.id}" data-market="${m.id}" data-label="${esc(o.label)}" aria-pressed="${sel}">${inner}</button></li>`
@@ -518,16 +519,33 @@
     </div>`;
   }
 
+  // Ogni post è un riquadro che si apre e si chiude (il primo è aperto); lo stato resta dopo una puntata
+  let openPosts = null;
   function postHtml(p, totals, myBets, canBet) {
-    return `<article class="post">
-      <div class="top">${p.game ? `<span class="chip">${esc(p.game)}</span>` : "<span></span>"}<span class="date">${when(p.created_at)}</span></div>
-      ${p.image_url ? `<img class="post-thumb" src="${esc(p.image_url)}" alt="Miniatura del video" loading="lazy">` : ""}
-      <h3>${esc(p.title)}</h3>
-      ${p.body && !(p.markets || []).some((m) => m.scope === "prossimo") ? `<p>${esc(p.body)}</p>` : ""}
-      ${p.video_url ? `<a class="yt" href="${esc(p.video_url)}" target="_blank" rel="noopener">Guarda il video ↗</a>` : ""}
-      ${(p.markets || []).slice().sort((a, b) => a.id - b.id).map((m) => marketHtml(m, totals, myBets, canBet)).join("")}
-    </article>`;
+    const markets = (p.markets || []).slice().sort((a, b) => a.id - b.id);
+    const rolling = markets.some((m) => m.scope === "prossimo");
+    const pool = markets.reduce((s, m) => s + (m.options || []).reduce((t, o) => t + Number((totals[o.id] || {}).total || 0), 0), 0);
+    const anyOpen = markets.some((m) => marketStatus(m).open);
+    const mine = myBets.filter((x) => markets.some((m) => m.id === x.market_id) && x.payout == null).length;
+    const meta = [rolling ? "Sempre aperto" : anyOpen ? "Puntate aperte" : "Chiuso", `${n(pool)} gettoni in palio`, mine ? `${mine} ${mine === 1 ? "tua puntata" : "tue puntate"}` : ""].filter(Boolean).join(" · ");
+    return `<details class="post" data-post="${p.id}" ${openPosts.has(p.id) ? "open" : ""}>
+      <summary class="post-sum">
+        <span class="post-sum-text">${p.game ? `<span class="chip">${esc(p.game)}</span>` : ""}<h3>${esc(p.title)}</h3><span class="post-meta">${meta}</span></span>
+        <span class="post-chev" aria-hidden="true"></span>
+      </summary>
+      <div class="post-body">
+        ${p.image_url ? `<img class="post-thumb" src="${esc(p.image_url)}" alt="Miniatura del video" loading="lazy">` : ""}
+        ${p.body && !rolling ? `<p>${esc(p.body)}</p>` : ""}
+        ${p.video_url ? `<a class="yt" href="${esc(p.video_url)}" target="_blank" rel="noopener">Guarda il video ↗</a>` : ""}
+        ${markets.map((m) => marketHtml(m, totals, myBets, canBet)).join("")}
+      </div>
+    </details>`;
   }
+  document.addEventListener("toggle", (e) => {
+    const d = e.target;
+    if (!(d instanceof HTMLDetailsElement) || !d.dataset.post || !openPosts) return;
+    if (d.open) openPosts.add(Number(d.dataset.post)); else openPosts.delete(Number(d.dataset.post));
+  }, true);
 
   async function renderPronostici() {
     const acct = document.getElementById("club-account");
@@ -545,6 +563,7 @@
       const { posts, totals, myBets, rounds } = await loadPosts();
       roundsByMarket = rounds || {};
       const canBet = Boolean(state.profile && state.profile.username);
+      if (!openPosts) openPosts = new Set(posts.length ? [posts[0].id] : []);
       list.innerHTML = posts.length
         ? posts.map((p) => postHtml(p, totals, myBets, canBet)).join("")
         : `<p class="empty">Ancora nessun post. Quando esce una nuova golfatina, qui si potrà pronosticare chi vince.</p>`;
