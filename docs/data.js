@@ -1,6 +1,6 @@
 // File generato da scripts/build_data.py: non modificarlo a mano.
 window.GOLFATINE = {
- "updated": "2026-11-16",
+ "updated": "2026-11-17",
  "lastMatch": "2026-11-16",
  "players": {
   "dread": {
@@ -15493,6 +15493,21 @@ window.GOLFATINE = {
   }
  ],
  "pending": [
+  {
+   "id": "xl0T15dVoI0",
+   "date": "2026-11-17",
+   "season": 2026,
+   "game": "uno",
+   "channel": "Delux",
+   "title": "UNO E GABBO ANCORA NON HA CAPITO QUALI SONO LE REGOLE. con Delux, Gabbo, Rohn & Mollu",
+   "url": "https://www.youtube.com/watch?v=xl0T15dVoI0",
+   "players": [
+    "rohn",
+    "delux",
+    "gabbo",
+    "mollu"
+   ]
+  },
   {
    "id": "MWyLk3R5Wjk",
    "date": "2026-11-15",
