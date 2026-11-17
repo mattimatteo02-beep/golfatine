@@ -15509,6 +15509,18 @@ window.GOLFATINE = {
    ]
   },
   {
+   "id": "8PZBEmiMTQ8",
+   "date": "2026-11-17",
+   "season": 2026,
+   "game": "golf",
+   "channel": "Just Rohn JR",
+   "title": "GOLFATINA nella FORESTA MELAGOODO...MA ROHN TIRA SEMPRE PER PRIMO! ⛳",
+   "url": "https://www.youtube.com/watch?v=8PZBEmiMTQ8",
+   "players": [
+    "rohn"
+   ]
+  },
+  {
    "id": "MWyLk3R5Wjk",
    "date": "2026-11-15",
    "season": 2026,
