@@ -1,6 +1,6 @@
 // File generato da scripts/build_data.py: non modificarlo a mano.
 window.GOLFATINE = {
- "updated": "2026-11-17",
+ "updated": "2026-11-18",
  "lastMatch": "2026-11-16",
  "players": {
   "dread": {
@@ -15493,6 +15493,18 @@ window.GOLFATINE = {
   }
  ],
  "pending": [
+  {
+   "id": "V_n0N6JUXAw",
+   "date": "2026-11-18",
+   "season": 2026,
+   "game": "gta",
+   "channel": "GaBBoDSQ",
+   "title": "LE ULTIME E INCREDIBILI SDROGO CORSE prima DI GTAVI",
+   "url": "https://www.youtube.com/watch?v=V_n0N6JUXAw",
+   "players": [
+    "gabbo"
+   ]
+  },
   {
    "id": "xl0T15dVoI0",
    "date": "2026-11-17",
