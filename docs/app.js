@@ -97,7 +97,8 @@
         ? `<span class="s">${r.strokes}</span><span class="tp">${r.toPar != null ? par(r.toPar) : ""}</span>`
         : r.points != null ? `<span class="s">${r.points}</span><span class="tp">pt</span>` : `<span class="s"></span><span class="tp"></span>`;
       const pos = r.pos == null ? "–" : r.pos;
-      return `<li class="${r.pos === 1 ? "win" : ""}"><span class="p">${pos}</span><span class="n ${guest(r.p) ? "guest" : ""}">${esc(name(r.p))}${guest(r.p) ? " (ospite)" : ""}</span>${extra}</li>`;
+      const medal = { 1: "🥇", 2: "🥈", 3: "🥉" }[r.pos];
+      return `<li class="${r.pos === 1 ? "win" : ""}" style="--pc:${color(r.p)}"><span class="p">${medal ? `<span class="medal" aria-label="${pos}">${medal}</span>` : pos}</span><span class="n ${guest(r.p) ? "guest" : ""}">${guest(r.p) ? "" : dot(r.p)}${esc(name(r.p))}${guest(r.p) ? " (ospite)" : ""}</span>${extra}</li>`;
     }).join("") + `</ol>`;
   }
 
@@ -154,6 +155,8 @@
     const golf = state.game === "golf";
     const gta = state.game === "gta";
     const maxW = Math.max(1, ...st.rows.map((r) => r.wins));
+    $("gb-name").textContent = g.name; $("gb-season").textContent = season == null ? "Tutte le stagioni" : `Stagione ${season}${season === CUR ? " · in corso" : ""}`;
+    const gb = document.querySelector(".game-banner"); gb.classList.remove("swap"); void gb.offsetWidth; gb.classList.add("swap");
     $("table-note").textContent = `${g.name}, ${season == null ? "tutte le stagioni" : "stagione " + season}: ${st.matches} partite.` +
       (st.byPos ? "" : " Per UNO conta solo il vincitore del video, quindi podi e posizione media non ci sono.") +
       (gta ? " Ogni video è un elenco di gare: vince chi chiude primo l'elenco. A pari vittorie contano le singole gare vinte." : "");
@@ -286,7 +289,9 @@
       extra = ` ${name(p)} ne ha vinte ${w}.`;
     }
     $("m-count").textContent = `${ms.length} partite.${extra}`;
-    $("matches").innerHTML = ms.slice(0, shown).map((m) => `<article class="match">
+    const vid = (u) => (String(u).match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{11})/) || [])[1];
+    $("matches").innerHTML = ms.slice(0, shown).map((m) => `<article class="match g-${m.game}">
+      ${vid(m.url) ? `<a class="match-thumb" href="${esc(m.url)}" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="https://i.ytimg.com/vi/${vid(m.url)}/mqdefault.jpg" alt="" loading="lazy" onerror="this.parentNode.remove()"><span class="play">▶</span></a>` : ""}
       <div class="top"><span class="date">${dateIt(m.date)}</span><span class="chip">${esc(GAME[m.game].short)}</span></div>
       <h3>${esc(m.title)}</h3>
       ${mapLine(m) ? `<div class="mapline">${mapLine(m)}</div>` : ""}
@@ -424,7 +429,7 @@
   function reveal() {
     if (!io) return;
     document.documentElement.classList.add("anim");
-    document.querySelectorAll(".kpis, .last, .albo-game, .player, .rec, .h2h, .match, .post, .pod, .lb, .board").forEach((el, i) => {
+    document.querySelectorAll(".kpis, .last, .albo-game, .player, .rec, .h2h, .match, .post, .lb-podium .pod, .lb, .board").forEach((el, i) => {
       if (el.dataset.rv) return; el.dataset.rv = "1"; el.classList.add("rv"); io.observe(el);
     });
   }
