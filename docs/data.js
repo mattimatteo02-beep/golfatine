@@ -15494,18 +15494,6 @@ window.GOLFATINE = {
  ],
  "pending": [
   {
-   "id": "GJayuJgBYQg",
-   "date": "2026-11-21",
-   "season": 2026,
-   "game": "gta",
-   "channel": "Just Rohn JR",
-   "title": "IRRUZIONE IN AEROPORTO & SDROGO CORSE SU GTA VI!?",
-   "url": "https://www.youtube.com/watch?v=GJayuJgBYQg",
-   "players": [
-    "rohn"
-   ]
-  },
-  {
    "id": "V_n0N6JUXAw",
    "date": "2026-11-18",
    "season": 2026,
