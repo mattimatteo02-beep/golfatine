@@ -1,6 +1,6 @@
 // File generato da scripts/build_data.py: non modificarlo a mano.
 window.GOLFATINE = {
- "updated": "2026-11-18",
+ "updated": "2026-11-21",
  "lastMatch": "2026-11-16",
  "players": {
   "dread": {
@@ -15493,6 +15493,18 @@ window.GOLFATINE = {
   }
  ],
  "pending": [
+  {
+   "id": "GJayuJgBYQg",
+   "date": "2026-11-21",
+   "season": 2026,
+   "game": "gta",
+   "channel": "Just Rohn JR",
+   "title": "IRRUZIONE IN AEROPORTO & SDROGO CORSE SU GTA VI!?",
+   "url": "https://www.youtube.com/watch?v=GJayuJgBYQg",
+   "players": [
+    "rohn"
+   ]
+  },
   {
    "id": "V_n0N6JUXAw",
    "date": "2026-11-18",
