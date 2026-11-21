@@ -528,7 +528,9 @@
     const anyOpen = markets.some((m) => marketStatus(m).open);
     const mine = myBets.filter((x) => markets.some((m) => m.id === x.market_id) && x.payout == null).length;
     const meta = [rolling ? "Sempre aperto" : anyOpen ? "Puntate aperte" : "Chiuso", `${n(pool)} gettoni in palio`, mine ? `${mine} ${mine === 1 ? "tua puntata" : "tue puntate"}` : ""].filter(Boolean).join(" · ");
-    return `<details class="post" data-post="${p.id}" ${openPosts.has(p.id) ? "open" : ""}>
+    const gname = String(p.game || "").toLowerCase();
+    const gid = (markets.find((m) => m.game) || {}).game || (/uno/.test(gname) ? "uno" : /battle/.test(gname) ? "sbg" : /gta|corse/.test(gname) ? "gta" : /golf/.test(gname) ? "golf" : "");
+    return `<details class="post" data-post="${p.id}" data-g="${gid}" ${openPosts.has(p.id) ? "open" : ""}>
       <summary class="post-sum">
         <span class="post-sum-text">${p.game ? `<span class="chip">${esc(p.game)}</span>` : ""}<h3>${esc(p.title)}</h3><span class="post-meta">${meta}</span></span>
         <span class="post-chev" aria-hidden="true"></span>
