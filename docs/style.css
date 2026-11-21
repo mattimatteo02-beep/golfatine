@@ -405,3 +405,102 @@ details.post[open] .post-chev { transform: rotate(-135deg); }
 .market .note.small { font-size: .8rem; }
 .bet-box { padding: 10px; }
 .bet-box .row .btn.small { padding: 6px 10px; }
+
+/* ===== Grafiche dinamiche (21/11/2026) ===== */
+/* Hero con illustrazione (fatta su Canva) che si muove piano e palline luminose */
+.hero { position: relative; overflow: hidden; isolation: isolate; }
+.hero-art { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: url("img/hero-golf.jpg") right center / cover no-repeat; opacity: .8; animation: hero-pan 28s ease-in-out infinite alternate; }
+.hero-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--fairway) 0, color-mix(in srgb, var(--fairway) 80%, transparent) 45%, transparent 100%), linear-gradient(0deg, var(--fairway) 0, transparent 35%); }
+@keyframes hero-pan { from { transform: scale(1.04) translateX(0); } to { transform: scale(1.12) translateX(-2%); } }
+.spark-ball { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #fff; box-shadow: 0 0 12px 3px rgb(47 161 82 / .7); left: 52%; bottom: 18%; opacity: 0; animation: ball-arc 6s cubic-bezier(.3, .6, .4, 1) infinite; z-index: 1; }
+.spark-ball.b2 { animation-delay: 2s; left: 60%; bottom: 10%; }
+.spark-ball.b3 { animation-delay: 4s; left: 45%; bottom: 25%; }
+@keyframes ball-arc { 0% { opacity: 0; transform: translate(0, 0); } 10% { opacity: .9; } 50% { transform: translate(18vw, -14vh); } 90% { opacity: .8; } 100% { opacity: 0; transform: translate(34vw, 0); } }
+.hero .kpis dd { font-variant-numeric: tabular-nums; text-shadow: 0 0 18px rgb(47 161 82 / .35); }
+/* Tabellone: le righe scorrono dentro una alla volta */
+.board-table tbody tr { animation: row-in .5s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(.25s + var(--i, 0) * .09s); }
+@keyframes row-in { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+.board { animation: board-glow 4s ease-in-out infinite alternate; }
+@keyframes board-glow { from { box-shadow: 0 18px 40px rgba(0,0,0,.35); } to { box-shadow: 0 18px 50px rgba(0,0,0,.35), 0 0 30px rgb(47 161 82 / .25); } }
+
+/* Comparsa delle schede quando entrano nello schermo */
+.anim .rv { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s cubic-bezier(.2, .8, .2, 1); }
+.anim .rv.in { opacity: 1; transform: none; }
+.anim .players .rv:nth-child(4n+2), .anim .records .rv:nth-child(4n+2), .anim .albo .rv:nth-child(4n+2) { transition-delay: .07s; }
+.anim .players .rv:nth-child(4n+3), .anim .records .rv:nth-child(4n+3), .anim .albo .rv:nth-child(4n+3) { transition-delay: .14s; }
+.anim .players .rv:nth-child(4n+4), .anim .records .rv:nth-child(4n+4), .anim .albo .rv:nth-child(4n+4) { transition-delay: .21s; }
+
+/* Schede che reagiscono al passaggio */
+.player, .rec, .albo-game, .last { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+@media (hover: hover) {
+  .player:hover, .rec:hover, .albo-game:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,.35), 0 0 0 1px color-mix(in srgb, var(--pc, var(--flag)) 50%, transparent); }
+}
+
+/* Classifica: righe e barre animate */
+.lb tbody tr { animation: row-up .45s ease both; animation-delay: calc(var(--i, 0) * .05s); }
+@keyframes row-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.lb .bar { transform-origin: left center; animation: bar-grow .9s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(.2s + var(--i, 0) * .06s); }
+@keyframes bar-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.lb tr.first td.pos { color: var(--flag); }
+
+/* Podio dei primi tre */
+.podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 10px; max-width: 620px; margin: 18px auto 22px; }
+.podium:empty { display: none; }
+.pod { display: grid; gap: 8px; text-align: center; }
+.pod-who { display: grid; justify-items: center; gap: 4px; position: relative; animation: pod-drop .6s cubic-bezier(.2, .8, .2, 1) both; }
+.pod-who .dot { width: 46px; height: 46px; filter: drop-shadow(0 6px 10px rgba(0,0,0,.4)); }
+.pod-1 .pod-who .dot { width: 60px; height: 60px; }
+.pod-who b { font: 700 1.15rem/1.1 var(--font-display); text-transform: uppercase; }
+.pod-who span { color: var(--muted); font-size: .8rem; }
+.pod-crown { font-size: 1.5rem; line-height: 1; animation: crown 2.4s ease-in-out infinite; }
+@keyframes crown { 0%, 100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-4px) rotate(6deg); } }
+.pod-step { border-radius: 8px 8px 0 0; display: grid; place-items: start center; padding-top: 8px; background: linear-gradient(180deg, color-mix(in srgb, var(--pc) 70%, #000) 0, color-mix(in srgb, var(--pc) 25%, var(--surface)) 100%); box-shadow: inset 0 2px 0 rgb(255 255 255 / .25); transform-origin: bottom; animation: step-up .7s cubic-bezier(.2, .8, .2, 1) both; }
+.pod-step span { font: 800 2rem/1 var(--font-display); color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,.4); }
+.pod-1 .pod-step { height: 110px; animation-delay: .25s; } .pod-1 .pod-who { animation-delay: .55s; }
+.pod-2 .pod-step { height: 80px; animation-delay: .1s; } .pod-2 .pod-who { animation-delay: .4s; }
+.pod-3 .pod-step { height: 58px; } .pod-3 .pod-who { animation-delay: .3s; }
+@keyframes step-up { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes pod-drop { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
+
+/* Giocatori: anello % vittorie e vittorie per anno */
+.player-top { position: relative; }
+.ring { --v: 0; margin-left: auto; flex: none; width: 58px; height: 58px; border-radius: 50%; display: grid; place-content: center; text-align: center; background: radial-gradient(closest-side, var(--surface) 76%, transparent 78% 100%), conic-gradient(var(--pc) calc(var(--v) * 1%), rgb(255 255 255 / .1) 0); }
+.ring span { font: 700 1rem/1 var(--font-display); }
+.ring small { font-size: .6rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.anim .player.rv.in .ring { animation: ring-fill 1.2s cubic-bezier(.2, .8, .2, 1) both; }
+@property --v { syntax: "<number>"; inherits: true; initial-value: 0; }
+@keyframes ring-fill { from { --v: 0; } }
+.spark { display: grid; gap: 4px; }
+.spark-bars { display: flex; align-items: end; gap: 3px; height: 38px; padding-bottom: 1px; border-bottom: 1px solid var(--line); }
+.spark-bars i { flex: 1; height: var(--h); min-width: 3px; border-radius: 2px 2px 0 0; background: color-mix(in srgb, var(--pc) 45%, transparent); transform-origin: bottom; }
+.spark-bars i.top { background: var(--pc); box-shadow: 0 0 8px color-mix(in srgb, var(--pc) 60%, transparent); }
+.anim .player.rv.in .spark-bars i { animation: step-up .6s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(.2s + var(--i) * .04s); }
+.spark-lbl { display: flex; justify-content: space-between; gap: 6px; font-size: .7rem; color: var(--muted); }
+
+/* Record: icona e colore del giocatore */
+.rec { position: relative; overflow: hidden; border-top: 4px solid var(--pc, var(--line)); background: linear-gradient(160deg, color-mix(in srgb, var(--pc, transparent) 12%, var(--surface)) 0, var(--surface) 70%); }
+.rec-ico { position: absolute; right: 12px; top: 10px; font-size: 2.2rem; opacity: .9; filter: drop-shadow(0 4px 8px rgba(0,0,0,.35)); }
+.rec .lbl { padding-right: 44px; }
+.rec .val { color: var(--pc, inherit); }
+.rec .who { display: flex; align-items: center; gap: 8px; }
+.rec .who .dot { width: 22px; height: 22px; }
+
+/* Albo d'oro: banner illustrato, coppe e leader che pulsa */
+#albo { position: relative; }
+#albo::before { content: ""; display: block; height: 190px; margin-bottom: 18px; border-radius: 12px; background: linear-gradient(90deg, var(--bg, #141518) 0, transparent 50%), url("img/banner-trofeo.jpg") 75% 35% / cover no-repeat; box-shadow: inset 0 0 0 1px var(--line); }
+.albo-game .cup { margin-right: 6px; font-size: .95em; }
+.albo-game li.is-live .live { animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--flag) 60%, transparent); } 50% { box-shadow: 0 0 0 6px transparent; } }
+.albo-game li { transition: background-color .2s ease; }
+.albo-game li:hover { background: rgb(255 255 255 / .03); }
+
+@media (max-width: 640px) {
+  .hero-art { opacity: .35; background-position: 70% center; }
+  .ring { width: 50px; height: 50px; }
+  .podium { gap: 6px; }
+  .pod-who b { font-size: .95rem; }
+  .pod-who span { font-size: .7rem; }
+  #albo::before { height: 96px; }
+}
+@media (prefers-reduced-motion: reduce) { .anim .rv { opacity: 1; transform: none; } }
+.lb td.wins { white-space: nowrap; }

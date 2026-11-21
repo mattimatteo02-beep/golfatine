@@ -78,13 +78,13 @@
       [core.length, "giocatori"],
       [seasons, "stagioni"],
       [golfUnder, "giri sotto il par"],
-    ].map(([v, l]) => `<div><dt>${l}</dt><dd>${v}</dd></div>`).join("");
+    ].map(([v, l]) => `<div><dt>${l}</dt><dd data-count="${v}">${v}</dd></div>`).join("");
 
     const st = standings("golf", CUR);
     $("board-cap").textContent = `Golf With Your Friends · ${CUR}`;
     $("board").innerHTML =
       `<thead><tr><th>Pos</th><th>Giocatore</th><th>V</th><th>Podi</th><th>Par</th></tr></thead><tbody>` +
-      st.rows.slice(0, 5).map((r, i) => `<tr><td>${i + 1}</td><td class="name">${esc(name(r.p))}</td><td class="${i === 0 ? "lead" : ""}">${r.wins}</td><td>${r.podi}</td><td class="${r.avgPar < 0 ? "lead" : ""}">${r.avgPar == null ? "–" : (r.avgPar > 0 ? "+" : r.avgPar < 0 ? "−" : "") + fmt(Math.abs(r.avgPar))}</td></tr>`).join("") +
+      st.rows.slice(0, 5).map((r, i) => `<tr style="--i:${i}"><td>${i + 1}</td><td class="name">${esc(name(r.p))}</td><td class="${i === 0 ? "lead" : ""}">${r.wins}</td><td>${r.podi}</td><td class="${r.avgPar < 0 ? "lead" : ""}">${r.avgPar == null ? "–" : (r.avgPar > 0 ? "+" : r.avgPar < 0 ? "−" : "") + fmt(Math.abs(r.avgPar))}</td></tr>`).join("") +
       `</tbody>`;
     $("board-foot").textContent = `${st.matches} partite giocate · Par = media colpi rispetto al par`;
   }
@@ -163,17 +163,32 @@
       (st.rows.length ? st.rows.map((r, i) => {
         if (!prev || !sameRank(r, prev, st.byPos)) rank = i + 1;
         prev = r;
-        return `<tr class="${rank === 1 ? "first" : ""}">
+        return `<tr class="${rank === 1 ? "first" : ""}" style="--i:${i}">
           <td class="pos">${rank}</td>
           <td><span class="pname">${dot(r.p)}${esc(name(r.p))}</span></td>
           <td>${r.played}</td>
-          <td class="wins">${r.wins}<span class="bar" style="width:${Math.round((40 * r.wins) / maxW)}px"></span></td>
+          <td class="wins">${r.wins}<span class="bar" style="width:${Math.round((40 * r.wins) / maxW)}px;--i:${i}"></span></td>
           <td>${fmt(r.pct, 0)}%</td>
           ${st.byPos ? `<td>${r.podi}</td><td>${r.avgPos == null ? "–" : fmt(r.avgPos, 2)}</td>` : ""}
           ${golf ? `<td>${par(r.avgPar, 1)}</td><td>${r.hio}</td>` : ""}
           ${gta ? `<td>${r.races}</td>` : ""}
         </tr>`;
       }).join("") : `<tr><td colspan="${head.length}" class="empty">Nessuna partita.</td></tr>`) + `</tbody>`;
+    renderPodium(st);
+  }
+  // podio dei primi tre sopra la tabella
+  function renderPodium(st) {
+    const top = st.rows.slice(0, 3);
+    if (top.length < 2) { $("podium").innerHTML = ""; return; }
+    const order = top.length === 3 ? [1, 0, 2] : [1, 0];
+    $("podium").innerHTML = order.map((k) => {
+      const r = top[k];
+      const sub = state.game === "golf" && r.avgPar != null ? `media ${par(r.avgPar, 1)}` : `${fmt(r.pct, 0)}% vinte`;
+      return `<div class="pod pod-${k + 1}" style="--pc:${color(r.p)}">
+        <div class="pod-who">${k === 0 ? '<span class="pod-crown" aria-hidden="true">👑</span>' : ""}${dot(r.p)}<b>${esc(name(r.p))}</b><span>${r.wins} vittorie · ${sub}</span></div>
+        <div class="pod-step"><span>${k + 1}</span></div>
+      </div>`;
+    }).join("");
   }
   function initTable() {
     renderGameSeg(); renderTable();
@@ -192,7 +207,7 @@
         const live = s === CUR;
         const who = list.map((r) => esc(name(r.p))).join(" e ") || "–";
         const w = list[0] ? list[0].wins : 0;
-        return `<li><span class="yr">${s}</span><span class="champ">${who}${live ? '<span class="live">in testa</span>' : ""}</span><span class="sub">${w} vitt. su ${st.matches}</span></li>`;
+        return `<li class="${live ? "is-live" : "is-done"}"><span class="yr">${s}</span><span class="champ">${live ? "" : '<span class="cup" aria-hidden="true">🏆</span>'}${who}${live ? '<span class="live">in testa</span>' : ""}</span><span class="sub">${w} vitt. su ${st.matches}</span></li>`;
       }).join("") + `</ol></div>`).join("");
   }
 
@@ -210,7 +225,19 @@
       const { list } = champions(g.id, s);
       if (list.some((r) => r.p === p)) titles.push({ g, s, live: s === CUR });
     }
-    return { played, wins, podi, hio, avgPar: toPar.length ? toPar.reduce((a, b) => a + b, 0) / toPar.length : null, best, titles };
+    const years = {};
+    for (const m of D.matches) { const r = m.results.find((x) => x.p === p); if (r && r.pos === 1) years[m.season] = (years[m.season] || 0) + 1; }
+    return { years, played, wins, podi, hio, avgPar: toPar.length ? toPar.reduce((a, b) => a + b, 0) / toPar.length : null, best, titles };
+  }
+  // vittorie per anno (tutti i giochi), mini grafico a barre
+  function sparkYears(years) {
+    const ys = Object.keys(years).map(Number);
+    if (!ys.length) return "";
+    const from = Math.max(2016, Math.min(...ys)), list = [];
+    for (let y = from; y <= CUR; y++) list.push([y, years[y] || 0]);
+    const max = Math.max(...list.map((a) => a[1]));
+    const best = list.reduce((a, b) => (b[1] > a[1] ? b : a));
+    return `<div class="spark" aria-label="Vittorie per anno"><div class="spark-bars">${list.map(([y, n], i) => `<i style="--h:${Math.max(4, Math.round((100 * n) / max))}%;--i:${i}" class="${n === best[1] ? "top" : ""}" title="${y}: ${n} vittorie"></i>`).join("")}</div><div class="spark-lbl"><span>${from}</span><span>anno top: ${best[0]} (${best[1]})</span><span>${CUR}</span></div></div>`;
   }
   function renderPlayers() {
     const list = core.map((p) => ({ p, ...playerStats(p) })).filter((x) => x.played).sort((a, b) => b.wins - a.wins);
@@ -218,12 +245,14 @@
       const pl = D.players[x.p];
       const alias = pl.alias.replace(/\s*\(da confermare\)/g, "");
       return `<button class="player" type="button" data-p="${x.p}" style="--pc:${color(x.p)}">
-        <div class="player-top">${dot(x.p)}<div><h3>${esc(pl.name)}</h3><div class="alias">${esc(alias)}</div></div></div>
+        <div class="player-top">${dot(x.p)}<div><h3>${esc(pl.name)}</h3><div class="alias">${esc(alias)}</div></div>
+          <div class="ring" style="--v:${Math.round((100 * x.wins) / x.played)}" title="Percentuale di vittorie"><span>${Math.round((100 * x.wins) / x.played)}%</span><small>vinte</small></div></div>
         <dl class="pstats">
           <div><dt>Partite</dt><dd>${x.played}</dd></div>
           <div><dt>Vittorie</dt><dd>${x.wins}</dd></div>
           <div><dt>Podi</dt><dd>${x.podi}</dd></div>
         </dl>
+        ${sparkYears(x.years)}
         ${x.titles.length ? `<div class="titles">${x.titles.map((t) => `<span class="trophy ${t.live ? "leader" : ""}">${t.live ? "In testa" : "Campione"} ${esc(t.g.short)} ${t.s}</span>`).join("")}</div>` : ""}
         <p class="fans-count" data-fans="${x.p}" hidden></p>
         <div class="pbest">Golf: media ${par(x.avgPar, 1)} vs par · ${x.hio} hole in one${x.best ? ` · miglior giro ${par(x.best.r.toPar)} su ${esc(x.best.m.map)}` : ""}</div>
@@ -322,9 +351,9 @@
       const d = s[0].strokes - w[0].strokes;
       if (!margin || d > margin.d) margin = { d, m, w: w[0], s: s[0] };
     }
-    if (best) recs.push({ lbl: "Miglior giro", val: par(best.r.toPar), who: name(best.r.p), ctx: `${esc(best.m.map)}, par ${best.m.par}, ${best.r.strokes} colpi · ${link(best.m)}` });
-    if (hio) recs.push({ lbl: "Più hole in one in una partita", val: hio.r.hio, who: name(hio.r.p), ctx: `${esc(hio.m.map || "")} · ${link(hio.m)}` });
-    if (margin) recs.push({ lbl: "Vittoria col distacco maggiore", val: `${margin.d} colpi`, who: name(margin.w.p), ctx: `su ${esc(name(margin.s.p))}, ${esc(margin.m.map || "")} · ${link(margin.m)}` });
+    if (best) recs.push({ icon: "⛳", p: best.r.p, lbl: "Miglior giro", val: par(best.r.toPar), who: name(best.r.p), ctx: `${esc(best.m.map)}, par ${best.m.par}, ${best.r.strokes} colpi · ${link(best.m)}` });
+    if (hio) recs.push({ icon: "🎯", p: hio.r.p, lbl: "Più hole in one in una partita", val: hio.r.hio, who: name(hio.r.p), ctx: `${esc(hio.m.map || "")} · ${link(hio.m)}` });
+    if (margin) recs.push({ icon: "💥", p: margin.w.p, lbl: "Vittoria col distacco maggiore", val: `${margin.d} colpi`, who: name(margin.w.p), ctx: `su ${esc(name(margin.s.p))}, ${esc(margin.m.map || "")} · ${link(margin.m)}` });
 
     // serie di vittorie consecutive (golf, nelle partite giocate)
     let streak = null;
@@ -336,7 +365,7 @@
         else cur = 0;
       }
     }
-    if (streak) recs.push({ lbl: "Serie di vittorie di fila (golf)", val: streak.n, who: name(streak.p), ctx: `dal ${dateIt(streak.start.date)} al ${dateIt(streak.end.date)}` });
+    if (streak) recs.push({ icon: "🔥", p: streak.p, lbl: "Serie di vittorie di fila (golf)", val: streak.n, who: name(streak.p), ctx: `dal ${dateIt(streak.start.date)} al ${dateIt(streak.end.date)}` });
 
     // più vittorie in una stagione
     let season = null;
@@ -344,13 +373,13 @@
       const r = standings(g.id, s).rows[0];
       if (r && (!season || r.wins > season.r.wins)) season = { r, g, s };
     }
-    if (season) recs.push({ lbl: "Più vittorie in una stagione", val: season.r.wins, who: name(season.r.p), ctx: `${esc(season.g.name)} ${season.s}${season.s === CUR ? " (in corso)" : ""}` });
+    if (season) recs.push({ icon: "🏆", p: season.r.p, lbl: "Più vittorie in una stagione", val: season.r.wins, who: name(season.r.p), ctx: `${esc(season.g.name)} ${season.s}${season.s === CUR ? " (in corso)" : ""}` });
 
     // hole in one in carriera
     const tot = standings("golf", null).rows.slice().sort((x, y) => y.hio - x.hio)[0];
-    if (tot) recs.push({ lbl: "Hole in one in carriera", val: tot.hio, who: name(tot.p), ctx: `in ${tot.played} golfatine` });
+    if (tot) recs.push({ icon: "🕳️", p: tot.p, lbl: "Hole in one in carriera", val: tot.hio, who: name(tot.p), ctx: `in ${tot.played} golfatine` });
 
-    $("records").innerHTML = recs.map((r) => `<div class="rec"><span class="lbl">${r.lbl}</span><span class="val">${r.val}</span><span class="who">${esc(r.who)}</span><span class="ctx">${r.ctx}</span></div>`).join("");
+    $("records").innerHTML = recs.map((r) => `<div class="rec" style="--pc:${color(r.p)}"><span class="rec-ico" aria-hidden="true">${r.icon}</span><span class="lbl">${r.lbl}</span><span class="val"${typeof r.val === "number" ? ` data-count="${r.val}"` : ""}>${r.val}</span><span class="who">${dot(r.p)}${esc(r.who)}</span><span class="ctx">${r.ctx}</span></div>`).join("");
   }
 
   // ---------- regole ----------
@@ -378,5 +407,29 @@
   window.addEventListener("hashchange", route);
   route();
 
-  renderHero(); renderLast(); initTable(); renderAlbo(); renderPlayers(); initMatches(); initH2H(); renderRecords(); renderRules();
+  // ---------- animazioni: numeri che contano e schede che entrano ----------
+  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function countUp(el) {
+    const end = Number(el.dataset.count); if (!isFinite(end) || still) return;
+    const t0 = performance.now(), dur = 900 + Math.min(700, end * 2);
+    const step = (t) => { const k = Math.min(1, (t - t0) / dur); el.textContent = Math.round(end * (1 - Math.pow(1 - k, 3))).toLocaleString("it-IT"); if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }
+  const io = "IntersectionObserver" in window && !still ? new IntersectionObserver((es) => es.forEach((e) => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add("in"); io.unobserve(e.target);
+    e.target.querySelectorAll("[data-count]").forEach(countUp);
+    if (e.target.dataset.count) countUp(e.target);
+  }), { rootMargin: "0px 0px -8% 0px" }) : null;
+  function reveal() {
+    if (!io) return;
+    document.documentElement.classList.add("anim");
+    document.querySelectorAll(".kpis, .last, .albo-game, .player, .rec, .h2h, .match, .post, .pod, .lb, .board").forEach((el, i) => {
+      if (el.dataset.rv) return; el.dataset.rv = "1"; el.classList.add("rv"); io.observe(el);
+    });
+  }
+  window.UMCreveal = reveal;
+  new MutationObserver(() => reveal()).observe(document.querySelector("main"), { childList: true, subtree: true });
+
+  renderHero(); renderLast(); initTable(); renderAlbo(); renderPlayers(); initMatches(); initH2H(); renderRecords(); renderRules(); reveal();
 })();
