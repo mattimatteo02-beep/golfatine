@@ -7,7 +7,7 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const n = (v) => Number(v || 0).toLocaleString("it-IT");
   const todayRome = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Rome" }).format(new Date());
-  const when = (iso) => new Date(iso).toLocaleString("it-IT", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  const when = (iso) => new Date(iso).toLocaleString("it-IT", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Rome" });
   const errText = (e) => (e && (e.message || e.error_description)) || "Qualcosa è andato storto, riprova.";
 
   const state = { session: null, profile: null };
@@ -416,7 +416,7 @@
     else if (fresh) parts.push(`<strong>Nuovo video uscito il ${esc(fresh.date.split("-").reverse().join("/"))}</strong>: le puntate fatte prima dell'uscita aspettano il risultato, quelle di adesso valgono per il video dopo.`);
     else parts.push(`Valgono le puntate fatte prima che esca il prossimo video. Si paga da solo appena c'è il risultato.`);
     const r = roundsByMarket[m.id];
-    if (r) {
+    if (r && !(r.outcome === "rimborsato" && !r.pool)) {
       const who = (r.result || []).map(pname);
       const res = r.outcome === "rimborsato" ? "puntate rimborsate" : m.kind === "podio" ? (who.length ? "podio " + who.map((x, i) => `${i + 1}° ${esc(x)}`).join(", ") : "podio non chiaro, rimborsato") : "ha vinto " + who.map(esc).join(" e ");
       parts.push(`Ultima ${esc(GAME_NAMES[m.game] || "partita")}: ${res}${r.pool ? ` (${n(r.pool)} gettoni in palio)` : ""}.`);
@@ -468,7 +468,7 @@
       ${!canBet && st.open ? `<p class="note small"><a href="#profilo" class="link-login">Accedi</a> per puntare.</p>` : ""}
       ${myList ? `<ul class="my-podiums">${myList}</ul>` : ""}
       <p class="msg" role="status" id="mmsg-${m.id}"></p>
-      <p class="note small">In palio: <span class="num">${n(pool)}</span> gettoni · ${bettors} ${bettors === 1 ? "podio giocato" : "podi giocati"}</p>
+      <p class="note small">${pool ? `In palio: <span class="num">${n(pool)}</span> gettoni · ${bettors} ${bettors === 1 ? "podio giocato" : "podi giocati"}` : "Ancora nessun podio giocato: sii il primo!"}</p>
     </div>`;
   }
   const podAmt = {};
@@ -515,7 +515,7 @@
       ${!canBet && st.open ? `<p class="note small"><a href="#profilo" class="link-login">Accedi</a> per puntare.</p>` : ""}
       ${result}
       <p class="msg" role="status" id="mmsg-${m.id}"></p>
-      <p class="note small">In palio: <span class="num">${n(pool)}</span> gettoni</p>
+      <p class="note small">${pool ? `In palio: <span class="num">${n(pool)}</span> gettoni` : "Ancora nessuna puntata: sii il primo!"}</p>
     </div>`;
   }
 
@@ -527,7 +527,7 @@
     const pool = markets.reduce((s, m) => s + (m.options || []).reduce((t, o) => t + Number((totals[o.id] || {}).total || 0), 0), 0);
     const anyOpen = markets.some((m) => marketStatus(m).open);
     const mine = myBets.filter((x) => markets.some((m) => m.id === x.market_id) && x.payout == null).length;
-    const meta = [rolling ? "Sempre aperto" : anyOpen ? "Puntate aperte" : "Chiuso", `${n(pool)} gettoni in palio`, mine ? `${mine} ${mine === 1 ? "tua puntata" : "tue puntate"}` : ""].filter(Boolean).join(" · ");
+    const meta = [rolling ? "Sempre aperto" : anyOpen ? "Puntate aperte" : "Chiuso", pool ? `${n(pool)} gettoni in palio` : "", mine ? `${mine} ${mine === 1 ? "tua puntata" : "tue puntate"}` : ""].filter(Boolean).join(" · ");
     const gname = String(p.game || "").toLowerCase();
     const gid = (markets.find((m) => m.game) || {}).game || (/uno/.test(gname) ? "uno" : /battle/.test(gname) ? "sbg" : /gta|corse/.test(gname) ? "gta" : /golf/.test(gname) ? "golf" : "");
     return `<details class="post" data-post="${p.id}" data-g="${gid}" ${openPosts.has(p.id) ? "open" : ""}>
