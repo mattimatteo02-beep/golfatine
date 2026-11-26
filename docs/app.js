@@ -10,7 +10,8 @@
   const DIMPLES = [[11, 9], [17, 8], [22, 11], [8, 15], [14, 14], [20, 16], [25, 17], [10, 21], [16, 20], [22, 22], [13, 26], [19, 26]];
   const core = Object.keys(D.players).filter((p) => !D.players[p].guest);
 
-  const name = (p) => (D.players[p] ? D.players[p].name : p);
+  // I nomi "da confermare" restano nei dati ma sul sito si mostra solo il nome
+  const name = (p) => (D.players[p] ? D.players[p].name : p).replace(/\s*\((da confermare|forse [^)]*)\)/gi, "");
   const guest = (p) => !D.players[p] || D.players[p].guest;
   const color = (p) => COLORS[p] || "#6b7a70";
   const initial = (p) => name(p).replace(/^il\s+/i, "").charAt(0).toUpperCase();
@@ -63,6 +64,8 @@
   function champions(game, season) {
     const st = standings(game, season);
     if (!st.rows.length) return { list: [], st };
+    // UNO senza vittorie del gruppo (ha vinto un ospite): nessun campione
+    if (!st.byPos && !st.rows[0].wins) return { list: [], st };
     const list = st.rows.filter((r) => sameRank(r, st.rows[0], st.byPos));
     return { list, st };
   }
@@ -208,9 +211,11 @@
       g.seasons.map((s) => {
         const { list, st } = champions(g.id, s);
         const live = s === CUR;
-        const who = list.map((r) => esc(name(r.p))).join(" e ") || "–";
-        const w = list[0] ? list[0].wins : 0;
-        return `<li class="${live ? "is-live" : "is-done"}"><span class="yr">${s}</span><span class="champ">${live ? "" : '<span class="cup" aria-hidden="true">🏆</span>'}${who}${live ? '<span class="live">in testa</span>' : ""}</span><span class="sub">${w} vitt. su ${st.matches}</span></li>`;
+        if (!list.length) return `<li class="is-done"><span class="yr">${s}</span><span class="champ">Vinta da un ospite</span><span class="sub">${st.matches} ${st.matches === 1 ? "partita" : "partite"}</span></li>`;
+        const who = list.map((r) => esc(name(r.p))).join(" e ");
+        const w = list[0].wins;
+        const sub = w ? `${w} vitt. su ${st.matches}` : `${list[0].podi} ${list[0].podi === 1 ? "podio" : "podi"} su ${st.matches}`;
+        return `<li class="${live ? "is-live" : "is-done"}"><span class="yr">${s}</span><span class="champ">${live ? "" : '<span class="cup" aria-hidden="true">🏆</span>'}${who}${live ? '<span class="live">in testa</span>' : ""}</span><span class="sub">${sub}</span></li>`;
       }).join("") + `</ol></div>`).join("");
   }
 
